@@ -1,118 +1,32 @@
 # Project Instructions
 
-Reusable **NestJS + Prisma backend starter** with a layered, type-safe architecture.
-The folder structure and principles below are **non-negotiable**.
+This is a reusable **NestJS + Prisma backend starter** with a strict, layered, type-safe architecture designed for scale and maintainability.
+
+## Non-negotiable rules
+
+1. **Every file has exactly one job.** `*.controller.ts` = HTTP only · `*.service.ts` = business logic only · `*.repo.ts` = data access only · `*.module.ts` = DI wiring only · `*.dto.ts` = validation only. A file over ~150 lines of logic is doing too much — split it.
+2. **Data access lives only in `common/repos/[domain].repo.ts`.** Nothing else touches Prisma. Ever.
+3. **Layers flow one way:** Controller → Service → Repository → Prisma. A controller may NOT call a repo. A service may NOT touch `req`/`res`. A repo may NOT hold business logic.
+4. **Services never return raw Prisma models.** Always return domain/response objects. Transform at the boundary.
+5. **Single source of truth.** Models in `schema.prisma`, validation in DTOs, errors in `common/errors/`, auth in `modules/core/auth/`, enums in `common/enums/`. No duplication anywhere.
+6. **Use the framework.** Prisma (not raw SQL), class-validator (not custom validators), Nest guards (not custom middleware), global interceptor (not ad-hoc wrappers). Don't hand-roll what Nest provides.
+7. **No `any` in services.** Strict types everywhere. DTOs are the type source. Prisma generates the rest.
+8. **No hardcoding.** Config, secrets, base URLs, magic numbers, role names, repeated literals — all live in env (`@nestjs/config`), `common/enums/`, or a constants file. Never inline.
+9. **No dead code, stubs, or placeholders.** Delete unused code. Comments explain WHY, not what.
+
+**Absolute imports via `@common/*` and `@lib/*`.** Never deep-relative (`../../../common/...`).
+
+**This is the only architecture.** Follow it precisely. If you're unsure where something goes, the design is broken—re-read this instead of inventing new locations.
 
 ---
 
-## Core Principles (Apply Everywhere)
+## Core Principle: Derive, Never Reconstruct
 
-**1. Single Responsibility: Each file has exactly one job.**
+If a library or framework generates a type, schema, validation result, or query shape, use that derived output directly. Examples: Prisma `GetPayload<>`, Zod `infer`, class-validator DTO output, NestJS guards, global interceptor results.
 
-- `*.controller.ts` = extract + delegate only · `*.service.ts` = business logic only · `*.repo.ts` = data access only · `*.module.ts` = DI wiring only · `*.dto.ts` = validation only.
+Never replace a derived artifact with `any`, `Record<>`, `as` assertions, or hand-written parallel types. If you need a smaller shape, derive it via framework helpers or standard TypeScript utilities (`Pick`, `Omit`), not ad hoc object literals.
 
-**2. One-Way Layers: Controller → Service → Repository → Database.**
-
-- Controller may NOT call repo. Service may NOT touch `req`/`res`. Repo may NOT hold business logic. No shortcuts.
-
-**3. Derive, Never Reconstruct.**
-
-- **Derived artifacts rule:** If a library or framework generates a type, schema, validation result, or query shape, use that derived output directly. Examples include Prisma `GetPayload<>`, Zod `infer`, class-validator DTO output, React Query results, NestJS query result shapes, and third-party package typings.
-- **No manual reconstruction:** Never replace a derived artifact with `any`, `Record<>`, `as { field?: type }`, or a hand-written parallel type just to satisfy the compiler.
-- **Narrow by derivation:** If you need a smaller shape, derive it from the source artifact with the framework's own helpers or standard TypeScript utilities like `Pick` and `Omit`, not ad hoc object literals.
-- **Validate at the boundary:** Decorators (`@IsEnum()`, etc.) in DTOs validate input once at the edge. Do not duplicate validation in services.
-- **Auth in controllers only:** Use `@UseGuards()` + `@Roles()` at the controller. Never hand-roll auth checks in services.
-- **Response shaping stays global:** The response interceptor owns success wrapping. Never build ad-hoc `{ status, data, message }` objects in controllers.
-- **Generalize the rule:** Whenever a new tool emits a type, shape, or validation outcome, prefer its generated output over inventing a parallel abstraction.
-
-**4. Define Once, Reference Everywhere.**
-
-- Models live in `schema.prisma` → Prisma types → DTOs reference the model. No duplication. Errors live in `common/errors/`, auth in `auth/`, repos in `common/repos/`.
-
-**5. Strict Types, Always.**
-
-- No `any`. DTOs are the validation + type source at boundaries. Prisma generates the rest. Return domain objects from services, not raw Prisma models.
-
-**6. No Dead Code, No Stubs, No Placeholders.**
-
-- Delete unused code. Comments explain _why_, not _what_.
-
-**7. Linting & Code Quality (Priority)**
-
-- **Linting is non-negotiable.** Every change must pass the project's linter without warnings or errors.
-- Before committing or reporting a task complete, verify `npm run lint` (or project's lint command) returns clean.
-- If a linting error arises, fix it immediately—do not ship or defer.
-- Type errors and linting failures block task completion; they are not "optional improvements."
-
----
-
-## Execution Protocol (Every Task)
-
-When you receive a prompt, follow this workflow **always**:
-
-1. **Think:** Understand the request, identify what's being asked, constraints, and scope.
-2. **Plan:** Determine the strategy—which files to touch, which layers involved, potential pitfalls, dependencies.
-3. **Generate the Perfect Prompt:** Frame your internal approach as a clear, actionable plan before implementing.
-4. **Execute:** Implement the plan, verify linting and type-safety, test the result end-to-end.
-
-This discipline ensures thoughtful, correct solutions without backtracking.
-
----
-
-## Folder Structure (Immutable)
-
-```
-src/
-├── main.ts                     Bootstrap
-├── app.module.ts               Root; imports every feature module
-├── common/                     Infrastructure (no domain logic)
-│   ├── database/               Prisma module + service
-│   ├── enums/                  TimeFilter, SortOrder, etc.
-│   ├── errors/                 RepoError, custom exceptions
-│   ├── filters/                http-exception.filter.ts (global)
-│   ├── interceptors/           response.interceptor.ts (global)
-│   ├── interfaces/             Types + re-exports
-│   ├── repos/                  [domain].repo.ts (query pattern only)
-│   └── services/               Cross-domain services (stats, etc.)
-├── lib/                        Pure utilities (no side effects)
-├── modules/core/               Feature modules
-│   ├── auth/                   JWT + guards (don't extend, use as-is)
-│   ├── users/                  Reference module — copy for new domains
-│   └── [domain]/               New feature modules here
-```
-
-Aliases: `@common/*`, `@lib/*` (tsconfig).
-
----
-
-## Workflow: Add a New Domain
-
-1. Add model to `schema.prisma` → `prisma migrate dev --name <name>`.
-2. Create `common/repos/[domain].repo.ts` (Prisma queries only) → register in `repo.module.ts`.
-3. Create `modules/core/[domain]/`: `dto/` (create + update), `[domain].service.ts`, `[domain].controller.ts`, `[domain].module.ts`.
-4. Import the module in `app.module.ts`.
-
-**Copy `modules/core/users/` as the reference.** The admin module already exposes generic CRUD over any repo, so new domains usually just add repo + service.
-
----
-
-## Layer Shape
-
-**Module** — import dependencies, declare controller + service, export service if shared.
-
-**Controller** — extract route params + body, call service, return result. Add `@UseGuards(JwtAuthGuard)` + `@Roles()` for protected routes. No logic.
-
-**Service** — accept DTOs, enforce rules, throw `HttpException`s, call repo methods, return domain objects (not raw Prisma models).
-
-**Repository** — wrap Prisma calls in `try/catch`, rethrow as `RepoError`. No business logic. Use `Prisma.[Model]GetPayload<>` for typed query results.
-
-**DTO** — class-validator decorators validate input at the boundary; `UpdateDto extends PartialType(CreateDto)`.
-
----
-
-## Applying Principles: Framework Examples
-
-**Principle 3 in action** — let frameworks infer, never hand-roll:
+**When you encounter a new framework tool:** First check whether it produces a derived type, schema, result shape, or validation outcome. If it does, use that output directly and avoid manual reconstruction with `any`, `Record<>`, `as` assertions, or parallel hand-written types.
 
 | Derived artifact        | Source → Use                                               | ✅ Do                                                            | ❌ Don't                                   |
 | ----------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------ |
@@ -122,25 +36,61 @@ Aliases: `@common/*`, `@lib/*` (tsconfig).
 | **NestJS guards**       | `@UseGuards(JwtAuthGuard)` → authenticated request         | Call the service after the guard passes                          | Hand-roll auth checks in the service       |
 | **Global interceptor**  | `return data` from controller → wrapped response           | Return the domain object directly                                | Build `{ status, data, message }` manually |
 
-**When you encounter a new framework tool:** First check whether it produces a derived type, schema, result shape, or validation outcome. If it does, use that output directly and avoid manual reconstruction with `any`, `Record<>`, `as` assertions, or parallel hand-written types.
+## Required patterns
+
+| Layer | Responsibility | Rules |
+|-------|---|---|
+| **Controller** | Extract route params + body, call service, return result. Add `@UseGuards(JwtAuthGuard)` + `@Roles()` for protected routes. | No business logic. No Prisma. No direct repo calls. |
+| **Service** | Accept DTOs, enforce business rules, throw `HttpException`s, call repo methods, return domain objects. | No raw Prisma models in responses. No `req`/`res` objects. Never throw `RepoError` directly. |
+| **Repository** | Wrap Prisma calls in `try/catch`, rethrow as `RepoError`. Use `Prisma.[Model]GetPayload<>` for typed results. | No business logic. Prisma only. Data access only. |
+| **DTO** | Use class-validator decorators for input validation at the boundary. `UpdateDto extends PartialType(CreateDto)`. | Type source for incoming data. Never used as response shape. |
+| **Module** | Import dependencies, declare controller + service, export service if shared. | DI wiring only. |
+
+## Folder Structure
+
+| Route | Purpose |
+|-------|---------|
+| `/src/common/` | Shared infrastructure: repos, filters, guards, errors, enums, decorators, middleware. |
+| `/src/common/repos/` | Data access layer. One `[domain].repo.ts` per entity. Prisma only. |
+| `/src/common/errors/` | Error definitions and error filter. |
+| `/src/common/enums/` | Constants and enums. Single source of truth. |
+| `/src/common/decorators/` | Custom decorators (auth, roles, etc.). |
+| `/src/lib/` | Pure utility functions and helpers. No NestJS dependencies. |
+| `/src/modules/core/` | Domain-specific modules. One folder per domain with `dto/`, `*.service.ts`, `*.controller.ts`, `*.module.ts`. |
+| `/src/modules/core/auth/` | Authentication logic. Already implemented. Extend, don't reinvent. |
+
+## Workflow: Add a new domain
+
+1. Add model to `schema.prisma` → run `prisma migrate dev --name <name>`.
+2. Create `common/repos/[domain].repo.ts` (Prisma queries) → register in `repo.module.ts`.
+3. Create `modules/core/[domain]/`: `dto/` (create + update), `[domain].service.ts`, `[domain].controller.ts`, `[domain].module.ts`.
+4. Import the module in `app.module.ts`.
 
 ---
 
-## Error Handling & Responses
+## File rules
 
-- Services throw Nest `HttpException`s; repos throw `RepoError`.
-- Global filter (`common/filters/http-exception.filter.ts`) formats errors.
-- Global interceptor (`common/interceptors/response.interceptor.ts`) wraps successes.
-- Never swallow errors or build ad-hoc response wrappers.
+- **Kebab-case filenames matching the export:** `user.service.ts` → `UserService`, `create-user.dto.ts` → `CreateUserDto`.
+- **Co-locate by domain** under `modules/core/<domain>/`. Shared infra stays in `common/`. Pure helpers in `lib/`.
+- **Add packages with `pnpm add`.** Never hand-edit `package.json`.
 
----
+## Error & response handling
 
-## Tech Stack
+- Throw typed errors anywhere: Nest exceptions in services, `RepoError` in repos.
+- `common/filters/http-exception.filter.ts` transforms every error into standard HTTP shape.
+- `common/interceptors/response.interceptor.ts` standardizes every success response: `{ status, data, message }`.
+- Never build ad-hoc response wrappers or swallow errors without the filter.
 
-NestJS · Prisma + PostgreSQL · class-validator · @nestjs/jwt + passport · @nestjs/swagger · Jest.
+## Pre-merge checklist
 
-Auth in `modules/core/auth/` is production-ready — use as-is, don't extend.
+1. `pnpm type-check` clean (`tsc --noEmit` — no type errors).
+2. `pnpm lint` clean.
+3. `pnpm build` succeeds.
+4. No `any` in services, no `console.log`, no dead code or stubs.
+5. No hardcoded config, secrets, or magic values (all in env, enums, or constants).
+6. Reused existing repos, guards, filters, and the global interceptor. Nothing reinvented.
+7. Followed the layer contracts. Matched the `users` module pattern exactly.
 
----
+**Tech stack:** NestJS · Prisma + PostgreSQL · class-validator / class-transformer · @nestjs/jwt + passport · @nestjs/swagger · Jest. Auth logic is in `modules/core/auth/` — extend it, never reinvent.
 
-**This is the only architecture.** Follow it precisely. If you're unsure where something goes, the design is broken—re-read this instead of inventing new locations.
+Workflow: Analyze → Plan → Implement
