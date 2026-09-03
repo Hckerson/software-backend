@@ -25,6 +25,26 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Environment setup
+
+```bash
+pnpm install
+cp .env.example .env
+pnpm keys:generate      # prints the JWT keypair env lines
+```
+
+Paste `JWT_PRIVATE_KEY` and `JWT_PUBLIC_KEY` into `.env`, and the `AUTH_JWT_PUBLIC_KEY` line
+into `../frontend/.env.local`. Tokens are signed RS256 so the frontend can verify sessions
+with the public half alone — never copy the private key out of this repo. The app refuses to
+boot if either key is missing.
+
+Then set `DATABASE_URL` and run `pnpm prisma:both` to generate the client and push the schema.
+
+## API contract
+
+`pnpm openapi` boots the app without a database and writes `openapi.json`, which the frontend
+consumes via its own `pnpm contract`. Regenerate it whenever a DTO or route changes.
+
 ## Project setup
 
 ```bash
