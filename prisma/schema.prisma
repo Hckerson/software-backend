@@ -43,10 +43,6 @@ enum Month {
 enum UserRole {
   ADMIN
   USER
-  MENTOR
-  STUDENT
-  GUARDIAN
-  SCHOOL_ADMIN
 }
 
 enum UserAccountStatus {
