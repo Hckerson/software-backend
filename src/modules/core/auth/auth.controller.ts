@@ -4,12 +4,15 @@ import { AuthService } from './auth.service';
 import {
     Post,
     Body,
+    Res,
     Request,
     HttpCode,
     UseGuards,
     Controller,
     HttpStatus,
 } from '@nestjs/common';
+import type { Response } from 'express';
+import { clearAuthCookie, setAuthCookie } from './auth.cookie';
 import {
     LoginDto,
     RegisterDto,
@@ -38,8 +41,15 @@ export class AuthController {
             'User successfully registered. Returns user + accessToken.',
     })
     @ApiResponse({ status: 409, description: 'User already exists' })
-    async register(@Body() dto: RegisterDto) {
-        return this.authService.register(dto);
+    async register(
+        @Body() dto: RegisterDto,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        const result = await this.authService.register(dto);
+
+        if (result.accessToken) setAuthCookie(response, result.accessToken);
+
+        return result;
     }
 
     @Post('login')
@@ -47,8 +57,25 @@ export class AuthController {
     @ApiOperation({ summary: 'Login and get JWT token' })
     @ApiResponse({ status: 200, description: 'Login successful' })
     @ApiResponse({ status: 401, description: 'Invalid credentials' })
-    async login(@Body() dto: LoginDto) {
-        return this.authService.login(dto);
+    async login(
+        @Body() dto: LoginDto,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        const result = await this.authService.login(dto);
+
+        if (result.accessToken) setAuthCookie(response, result.accessToken);
+
+        return result;
+    }
+
+    @Post('logout')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Clear the session cookie' })
+    @ApiResponse({ status: 200, description: 'Session cleared' })
+    logout(@Res({ passthrough: true }) response: Response) {
+        clearAuthCookie(response);
+
+        return { message: 'Signed out.' };
     }
 
     // ─── Password Management ──────────────────────────────────────────────────
