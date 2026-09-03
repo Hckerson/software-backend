@@ -7,14 +7,14 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { BillingService } from './billing.service';
-import { JwtAuthGuard } from '@core/auth/guards';
+import { JwtAuthGuard, RolesGuard } from '@core/auth/guards';
 import { Roles } from '@core/auth/decorators';
 
 import { SubscriptionStatus } from 'generated/prisma/client';
 
 @ApiTags('Billing - Admin Dashboard')
 @Controller('admin/billing')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
 @ApiBearerAuth()
 export class BillingController {
