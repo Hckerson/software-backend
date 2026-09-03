@@ -1,0 +1,1414 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User successfully registered. Returns user + accessToken."
+          },
+          "409": {
+            "description": "User already exists"
+          }
+        },
+        "summary": "Register a new user",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        },
+        "summary": "Login and get JWT token",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Session cleared"
+          }
+        },
+        "summary": "Clear the session cookie",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Request a password reset",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Reset password",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/onboarding": {
+      "post": {
+        "operationId": "AuthController_onboarding",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Complete profile onboarding",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/users": {
+      "post": {
+        "operationId": "UsersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new user (Admin only)",
+        "tags": [
+          "users"
+        ]
+      },
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all users (Admin only)",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user profile",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user by ID",
+        "tags": [
+          "users"
+        ]
+      },
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user profile",
+        "tags": [
+          "users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete user (Admin only)",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/admin/stats": {
+      "get": {
+        "operationId": "AdminController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Platform-wide account and billing counters",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/billing/plans": {
+      "get": {
+        "operationId": "PlansController_getAllPlans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get all subscription plans",
+        "tags": [
+          "Billing - Plans"
+        ]
+      },
+      "post": {
+        "operationId": "PlansController_createPlan",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create new subscription plan (admin only)",
+        "tags": [
+          "Billing - Plans"
+        ]
+      }
+    },
+    "/api/billing/plans/{id}": {
+      "get": {
+        "operationId": "PlansController_getPlanById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get plan by ID",
+        "tags": [
+          "Billing - Plans"
+        ]
+      },
+      "patch": {
+        "operationId": "PlansController_updatePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update subscription plan (admin only)",
+        "tags": [
+          "Billing - Plans"
+        ]
+      },
+      "delete": {
+        "operationId": "PlansController_deletePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete subscription plan (admin only)",
+        "tags": [
+          "Billing - Plans"
+        ]
+      }
+    },
+    "/api/billing/plans/{id}/deactivate": {
+      "patch": {
+        "operationId": "PlansController_deactivatePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Deactivate plan (admin only)",
+        "tags": [
+          "Billing - Plans"
+        ]
+      }
+    },
+    "/api/billing/plans/{id}/activate": {
+      "patch": {
+        "operationId": "PlansController_activatePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activate plan (admin only)",
+        "tags": [
+          "Billing - Plans"
+        ]
+      }
+    },
+    "/api/subscriptions/current": {
+      "get": {
+        "operationId": "SubscriptionsController_getCurrentSubscription",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current active subscription",
+        "tags": [
+          "Billing - Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/history": {
+      "get": {
+        "operationId": "SubscriptionsController_getSubscriptionHistory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get subscription history",
+        "tags": [
+          "Billing - Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/select-plan": {
+      "post": {
+        "operationId": "SubscriptionsController_selectPlan",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectPlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Select plan at signup",
+        "tags": [
+          "Billing - Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/change-plan": {
+      "post": {
+        "operationId": "SubscriptionsController_changePlan",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change to different plan",
+        "tags": [
+          "Billing - Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/cancel": {
+      "post": {
+        "operationId": "SubscriptionsController_cancelSubscription",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel subscription",
+        "tags": [
+          "Billing - Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/reactivate": {
+      "post": {
+        "operationId": "SubscriptionsController_reactivateSubscription",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reactivate subscription",
+        "tags": [
+          "Billing - Subscriptions"
+        ]
+      }
+    },
+    "/api/invoices": {
+      "get": {
+        "operationId": "InvoicesController_getInvoices",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user invoices",
+        "tags": [
+          "Billing - Invoices"
+        ]
+      }
+    },
+    "/api/invoices/{id}": {
+      "get": {
+        "operationId": "InvoicesController_getInvoiceById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get invoice by ID",
+        "tags": [
+          "Billing - Invoices"
+        ]
+      }
+    },
+    "/api/invoices/upcoming/estimate": {
+      "get": {
+        "operationId": "InvoicesController_getUpcomingInvoice",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get upcoming invoice estimate",
+        "tags": [
+          "Billing - Invoices"
+        ]
+      }
+    },
+    "/api/invoices/{id}/mark-paid": {
+      "post": {
+        "operationId": "InvoicesController_markInvoicePaid",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark invoice as paid",
+        "tags": [
+          "Billing - Invoices"
+        ]
+      }
+    },
+    "/api/usage/track": {
+      "post": {
+        "operationId": "UsageController_trackUsage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrackUsageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Track usage",
+        "tags": [
+          "Billing - Usage"
+        ]
+      }
+    },
+    "/api/usage/current": {
+      "get": {
+        "operationId": "UsageController_getCurrentUsage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current period usage",
+        "tags": [
+          "Billing - Usage"
+        ]
+      }
+    },
+    "/api/usage/history": {
+      "get": {
+        "operationId": "UsageController_getUsageHistory",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Period key (YYYY-MM format)",
+            "schema": {
+              "example": "2026-06",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get usage history",
+        "tags": [
+          "Billing - Usage"
+        ]
+      }
+    },
+    "/api/usage/check-limit/{metric}": {
+      "get": {
+        "operationId": "UsageController_checkLimit",
+        "parameters": [
+          {
+            "name": "metric",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check limit for metric",
+        "tags": [
+          "Billing - Usage"
+        ]
+      }
+    },
+    "/api/admin/billing/stats": {
+      "get": {
+        "operationId": "BillingController_getBillingStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get billing statistics",
+        "tags": [
+          "Billing - Admin Dashboard"
+        ]
+      }
+    },
+    "/api/admin/billing/subscriptions": {
+      "get": {
+        "operationId": "BillingController_getAllSubscriptions",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all subscriptions",
+        "tags": [
+          "Billing - Admin Dashboard"
+        ]
+      }
+    },
+    "/api/admin/billing/subscriptions/status/{status}": {
+      "get": {
+        "operationId": "BillingController_getSubscriptionsByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get subscriptions by status",
+        "tags": [
+          "Billing - Admin Dashboard"
+        ]
+      }
+    },
+    "/api/admin/billing/overdue-invoices": {
+      "get": {
+        "operationId": "BillingController_getOverdueInvoices",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get overdue invoices",
+        "tags": [
+          "Billing - Admin Dashboard"
+        ]
+      }
+    },
+    "/api/admin/billing/invoice-stats": {
+      "get": {
+        "operationId": "BillingController_getInvoiceStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get invoice statistics",
+        "tags": [
+          "Billing - Admin Dashboard"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API",
+    "description": "Backend REST API documentation",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ],
+            "default": "USER"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+1234567890"
+          }
+        },
+        "required": [
+          "fullName",
+          "email",
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "example": "newpassword123"
+          },
+          "token": {
+            "type": "string",
+            "example": "reset-token-abc"
+          }
+        },
+        "required": [
+          "password",
+          "token"
+        ]
+      },
+      "OnboardingDto": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Short profile bio"
+          }
+        }
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ],
+            "default": "USER"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Short profile bio"
+          }
+        },
+        "required": [
+          "fullName",
+          "email",
+          "password"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ],
+            "default": "USER"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Short profile bio"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "PENDING",
+              "SUSPENDED"
+            ]
+          }
+        }
+      },
+      "CreatePlanDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Plan name",
+            "example": "Pro Plan"
+          },
+          "description": {
+            "type": "string",
+            "description": "Plan description",
+            "example": "Our premium plan"
+          },
+          "planType": {
+            "type": "string",
+            "description": "Plan type",
+            "enum": [
+              "FREE",
+              "PRO",
+              "ENTERPRISE"
+            ],
+            "example": "PRO"
+          },
+          "priceUSD": {
+            "type": "number",
+            "description": "Monthly price in USD",
+            "example": 29.99
+          },
+          "features": {
+            "type": "object",
+            "description": "Plan features",
+            "example": {
+              "apiCalls": 50000,
+              "storage": 50,
+              "seats": 5
+            }
+          },
+          "limits": {
+            "type": "object",
+            "description": "Plan limits",
+            "example": {
+              "maxApiCalls": 50000,
+              "maxStorage": 50,
+              "maxSeats": 5
+            }
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "planType",
+          "priceUSD",
+          "features",
+          "limits"
+        ]
+      },
+      "UpdatePlanDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Plan name",
+            "example": "Pro Plan"
+          },
+          "description": {
+            "type": "string",
+            "description": "Plan description",
+            "example": "Our premium plan"
+          },
+          "planType": {
+            "type": "string",
+            "description": "Plan type",
+            "enum": [
+              "FREE",
+              "PRO",
+              "ENTERPRISE"
+            ],
+            "example": "PRO"
+          },
+          "priceUSD": {
+            "type": "number",
+            "description": "Monthly price in USD",
+            "example": 29.99
+          },
+          "features": {
+            "type": "object",
+            "description": "Plan features",
+            "example": {
+              "apiCalls": 50000,
+              "storage": 50,
+              "seats": 5
+            }
+          },
+          "limits": {
+            "type": "object",
+            "description": "Plan limits",
+            "example": {
+              "maxApiCalls": 50000,
+              "maxStorage": 50,
+              "maxSeats": 5
+            }
+          }
+        }
+      },
+      "SelectPlanDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "description": "Subscription plan ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        },
+        "required": [
+          "planId"
+        ]
+      },
+      "ChangePlanDto": {
+        "type": "object",
+        "properties": {
+          "newPlanId": {
+            "type": "string",
+            "description": "New subscription plan ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        },
+        "required": [
+          "newPlanId"
+        ]
+      },
+      "TrackUsageDto": {
+        "type": "object",
+        "properties": {
+          "metricType": {
+            "type": "string",
+            "description": "Usage metric type",
+            "enum": [
+              "API_CALLS",
+              "STORAGE_GB",
+              "SEATS"
+            ],
+            "example": "API_CALLS"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount used",
+            "example": 1500
+          }
+        },
+        "required": [
+          "metricType",
+          "amount"
+        ]
+      }
+    }
+  }
+}
