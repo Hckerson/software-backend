@@ -38,15 +38,16 @@ export class InvoicesController {
     @ApiOperation({ summary: 'Get invoice by ID' })
     @Get(':id')
     async getInvoiceById(
+        @CurrentUser('id') userId: string,
         @Param('id') id: string,
     ): Promise<InvoiceWithRelations> {
-        return this.invoicesService.getInvoiceById(id);
+        return this.invoicesService.getInvoiceById(id, userId);
     }
 
     @ApiOperation({ summary: 'Get upcoming invoice estimate' })
     @Get('upcoming/estimate')
     async getUpcomingInvoice(
-        @CurrentUser('subscriptionId') subscriptionId: string,
+        @CurrentUser('id') userId: string,
     ): Promise<{
         subscriptionId: string;
         amount: number;
@@ -55,15 +56,16 @@ export class InvoicesController {
         billingPeriodEnd: Date;
         planName: string;
     }> {
-        return this.invoicesService.getUpcomingInvoice(subscriptionId);
+        return this.invoicesService.getUpcomingInvoice(userId);
     }
 
     @ApiOperation({ summary: 'Mark invoice as paid' })
     @Post(':id/mark-paid')
     @HttpCode(HttpStatus.OK)
     async markInvoicePaid(
+        @CurrentUser('id') userId: string,
         @Param('id') id: string,
     ): Promise<InvoiceWithRelations> {
-        return this.invoicesService.markInvoicePaid(id);
+        return this.invoicesService.markInvoicePaid(id, userId);
     }
 }

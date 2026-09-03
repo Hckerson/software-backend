@@ -7,6 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '@core/users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaService } from '@common/database/prisma.service';
+import { JWT_ALGORITHM, privateKeyFrom, publicKeyFrom } from './auth.keys';
 
 @Module({
     imports: [
@@ -14,18 +15,15 @@ import { PrismaService } from '@common/database/prisma.service';
         PassportModule,
         JwtModule.registerAsync({
             inject: [ConfigService],
-            useFactory: (config: ConfigService) => {
-                const secret = config.get<string>('JWT_SECRET');
-                if (!secret) {
-                    throw new Error(
-                        'JWT_SECRET is not defined in environment variables',
-                    );
-                }
-                return {
-                    secret: secret,
-                    signOptions: { expiresIn: '7d' },
-                };
-            },
+            useFactory: (config: ConfigService) => ({
+                privateKey: privateKeyFrom(config),
+                publicKey: publicKeyFrom(config),
+                signOptions: {
+                    algorithm: JWT_ALGORITHM,
+                    expiresIn: '7d',
+                },
+                verifyOptions: { algorithms: [JWT_ALGORITHM] },
+            }),
         }),
     ],
     providers: [AuthService, JwtStrategy, PrismaService],
