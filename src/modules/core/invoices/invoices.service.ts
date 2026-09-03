@@ -3,7 +3,11 @@ import {
     NotFoundException,
     BadRequestException,
 } from '@nestjs/common';
-import { Prisma, InvoiceStatus } from 'generated/prisma/client';
+import {
+    Prisma,
+    InvoiceStatus,
+    SubscriptionStatus,
+} from 'generated/prisma/client';
 import { InvoiceRepo } from '@common/repos/invoice.repo';
 import { SubscriptionRepo } from '@common/repos/subscription.repo';
 import { InvoiceQueryDto } from './dto';
@@ -34,18 +38,21 @@ export class InvoicesService {
         })) as InvoiceWithRelations[];
     }
 
-    async getInvoiceById(id: string): Promise<InvoiceWithRelations> {
+    async getInvoiceById(
+        id: string,
+        userId?: string,
+    ): Promise<InvoiceWithRelations> {
         const invoice = await this.invoiceRepo.findUnique({
             where: { id },
             include: { subscription: { include: { plan: true } }, user: true },
         });
-        if (!invoice) {
+        if (!invoice || (userId && invoice.userId !== userId)) {
             throw new NotFoundException(`Invoice with ID ${id} not found`);
         }
         return invoice as InvoiceWithRelations;
     }
 
-    async getUpcomingInvoice(subscriptionId: string): Promise<{
+    async getUpcomingInvoice(userId: string): Promise<{
         subscriptionId: string;
         amount: number;
         dueDate: Date;
@@ -53,13 +60,13 @@ export class InvoicesService {
         billingPeriodEnd: Date;
         planName: string;
     }> {
-        const subscription = await this.subscriptionRepo.findUnique({
-            where: { id: subscriptionId },
+        const subscription = await this.subscriptionRepo.findFirst({
+            where: { userId, status: SubscriptionStatus.ACTIVE },
             include: { plan: true },
         });
         if (!subscription) {
             throw new NotFoundException(
-                `Subscription with ID ${subscriptionId} not found`,
+                `No active subscription found for user ${userId}`,
             );
         }
 
@@ -73,7 +80,7 @@ export class InvoicesService {
         dueDate.setDate(dueDate.getDate() + 14);
 
         return {
-            subscriptionId,
+            subscriptionId: subscription.id,
             amount: basePriceUSD,
             dueDate,
             billingPeriodStart: subscription.currentBillingPeriodStart,
@@ -82,8 +89,11 @@ export class InvoicesService {
         };
     }
 
-    async markInvoicePaid(id: string): Promise<InvoiceWithRelations> {
-        const invoice = await this.getInvoiceById(id);
+    async markInvoicePaid(
+        id: string,
+        userId?: string,
+    ): Promise<InvoiceWithRelations> {
+        const invoice = await this.getInvoiceById(id, userId);
 
         if (invoice.status === InvoiceStatus.PAID) {
             throw new BadRequestException('Invoice is already marked as paid');
