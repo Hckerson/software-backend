@@ -23,8 +23,9 @@
         "keys:generate": "node tools/generate-keys.mjs",
         "prisma:generate": "npx prisma generate",
         "prisma:push": "npx prisma db push",
-        "prisma:both": "npx prisma generate && npx prisma db push",
-        "seed": "nest build && node dist/prisma/seed.js"
+        "prisma:both": "npx prisma generate && npx prisma db push && pnpm db:constraints",
+        "seed": "nest build && node dist/prisma/seed.js",
+        "db:constraints": "nest build && node dist/prisma/apply-constraints.js"
     },
     "prisma": {
         "seed": "nest build && node dist/prisma/seed.js"

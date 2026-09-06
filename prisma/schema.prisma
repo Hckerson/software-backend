@@ -154,7 +154,6 @@ model Subscription {
   usageLogs     UsageLog[]
   billingAudits BillingAudit[]
 
-  @@unique([userId, status])
   @@index([userId])
   @@index([planId])
 }
