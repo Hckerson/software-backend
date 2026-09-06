@@ -7,7 +7,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -31,7 +38,14 @@
         },
         "responses": {
           "201": {
-            "description": "User successfully registered. Returns user + accessToken."
+            "description": "User successfully registered. Returns user + accessToken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
           },
           "409": {
             "description": "User already exists"
@@ -59,7 +73,14 @@
         },
         "responses": {
           "200": {
-            "description": "Login successful"
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
           },
           "401": {
             "description": "Invalid credentials"
@@ -77,7 +98,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Session cleared"
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageDto"
+                }
+              }
+            }
           }
         },
         "summary": "Clear the session cookie",
@@ -102,7 +130,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageDto"
+                }
+              }
+            }
           }
         },
         "summary": "Request a password reset",
@@ -127,7 +162,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageDto"
+                }
+              }
+            }
           }
         },
         "summary": "Reset password",
@@ -152,7 +194,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -182,7 +231,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicUserDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -200,7 +256,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicUserDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -217,19 +283,17 @@
     "/api/users/me": {
       "get": {
         "operationId": "UsersController_getMe",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicUserDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -258,7 +322,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicUserDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -295,7 +366,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicUserDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -322,7 +400,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicUserDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -342,7 +427,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStatsDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -362,7 +454,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionPlanDto"
+                  }
+                }
+              }
+            }
           }
         },
         "summary": "Get all subscription plans",
@@ -385,7 +487,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionPlanDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -414,7 +523,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionPlanDto"
+                }
+              }
+            }
           }
         },
         "summary": "Get plan by ID",
@@ -446,7 +562,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionPlanDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -502,7 +625,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionPlanDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -531,7 +661,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionPlanDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -551,7 +688,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -571,7 +715,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -601,7 +755,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -630,8 +791,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -650,8 +818,15 @@
         "operationId": "SubscriptionsController_cancelSubscription",
         "parameters": [],
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -670,8 +845,15 @@
         "operationId": "SubscriptionsController_reactivateSubscription",
         "parameters": [],
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -721,7 +903,17 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InvoiceDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -750,7 +942,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -770,7 +969,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpcomingInvoiceDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -799,7 +1005,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -829,7 +1042,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageLogDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -849,7 +1069,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetricUsageDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -857,7 +1087,7 @@
             "bearer": []
           }
         ],
-        "summary": "Get current period usage",
+        "summary": "Current period usage for every metric",
         "tags": [
           "Billing - Usage"
         ]
@@ -876,11 +1106,35 @@
               "example": "2026-06",
               "type": "string"
             }
+          },
+          {
+            "name": "metricType",
+            "required": false,
+            "in": "query",
+            "description": "Restrict the history to a single metric",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "API_CALLS",
+                "STORAGE_GB",
+                "SEATS"
+              ]
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsageLogDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -889,6 +1143,36 @@
           }
         ],
         "summary": "Get usage history",
+        "tags": [
+          "Billing - Usage"
+        ]
+      }
+    },
+    "/api/usage/limits": {
+      "get": {
+        "operationId": "UsageController_checkAllLimits",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LimitCheckDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Limit status for every metric",
         "tags": [
           "Billing - Usage"
         ]
@@ -909,7 +1193,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LimitCheckDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -917,7 +1208,7 @@
             "bearer": []
           }
         ],
-        "summary": "Check limit for metric",
+        "summary": "Limit status for one metric",
         "tags": [
           "Billing - Usage"
         ]
@@ -929,7 +1220,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingStatsDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -966,7 +1264,17 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1011,7 +1319,17 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1031,7 +1349,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InvoiceDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1051,7 +1379,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceStatsDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1062,6 +1397,260 @@
         "summary": "Get invoice statistics",
         "tags": [
           "Billing - Admin Dashboard"
+        ]
+      }
+    },
+    "/api/admin/billing/cycle/run": {
+      "post": {
+        "operationId": "CycleController_runAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleRunAllDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Run renewal and the overdue sweep. Idempotent.",
+        "tags": [
+          "Billing - Cycle"
+        ]
+      }
+    },
+    "/api/admin/billing/cycle/renew": {
+      "post": {
+        "operationId": "CycleController_renew",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleRunSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Renew subscriptions past their period end",
+        "tags": [
+          "Billing - Cycle"
+        ]
+      }
+    },
+    "/api/admin/billing/cycle/sweep-overdue": {
+      "post": {
+        "operationId": "CycleController_sweepOverdue",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CycleRunSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark sent invoices past due as overdue",
+        "tags": [
+          "Billing - Cycle"
+        ]
+      }
+    },
+    "/api/admin/billing/cycle/subscriptions/{id}/issue-invoice": {
+      "post": {
+        "operationId": "CycleController_issueInvoice",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Issue the invoice for a subscription period",
+        "tags": [
+          "Billing - Cycle"
+        ]
+      }
+    },
+    "/api/payment-methods": {
+      "get": {
+        "operationId": "PaymentMethodsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentMethodDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List your payment methods",
+        "tags": [
+          "Billing - Payment Methods"
+        ]
+      },
+      "post": {
+        "operationId": "PaymentMethodsController_add",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentMethodDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethodDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a payment method",
+        "tags": [
+          "Billing - Payment Methods"
+        ]
+      }
+    },
+    "/api/payment-methods/{id}/default": {
+      "patch": {
+        "operationId": "PaymentMethodsController_setDefault",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethodDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Make a payment method the default",
+        "tags": [
+          "Billing - Payment Methods"
+        ]
+      }
+    },
+    "/api/payment-methods/{id}": {
+      "delete": {
+        "operationId": "PaymentMethodsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethodDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a payment method",
+        "tags": [
+          "Billing - Payment Methods"
         ]
       }
     }
@@ -1117,6 +1706,49 @@
           "password"
         ]
       },
+      "AuthResponseUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Alias of fullName"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "role"
+        ]
+      },
+      "AuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/AuthResponseUserDto"
+          },
+          "accessToken": {
+            "type": "string",
+            "description": "Bearer token for non-browser clients. Browsers receive an httpOnly cookie and ignore this field."
+          }
+        },
+        "required": [
+          "user"
+        ]
+      },
       "LoginDto": {
         "type": "object",
         "properties": {
@@ -1132,6 +1764,18 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "MessageDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Password reset successful."
+          }
+        },
+        "required": [
+          "message"
         ]
       },
       "ForgotPasswordDto": {
@@ -1214,6 +1858,73 @@
           "password"
         ]
       },
+      "PublicUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatar": {
+            "type": "string",
+            "nullable": true
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "PENDING",
+              "SUSPENDED"
+            ]
+          },
+          "lastActive": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fullName",
+          "email",
+          "phoneNumber",
+          "avatar",
+          "bio",
+          "role",
+          "status",
+          "lastActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "UpdateUserDto": {
         "type": "object",
         "properties": {
@@ -1254,6 +1965,112 @@
             ]
           }
         }
+      },
+      "AdminStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalUsers": {
+            "type": "number"
+          },
+          "activeUsers": {
+            "type": "number"
+          },
+          "pendingUsers": {
+            "type": "number"
+          },
+          "suspendedUsers": {
+            "type": "number"
+          },
+          "activeSubscriptions": {
+            "type": "number"
+          },
+          "pastDueSubscriptions": {
+            "type": "number"
+          },
+          "canceledSubscriptions": {
+            "type": "number"
+          },
+          "overdueInvoices": {
+            "type": "number"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "totalUsers",
+          "activeUsers",
+          "pendingUsers",
+          "suspendedUsers",
+          "activeSubscriptions",
+          "pastDueSubscriptions",
+          "canceledSubscriptions",
+          "overdueInvoices",
+          "timestamp"
+        ]
+      },
+      "SubscriptionPlanDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "priceUSD": {
+            "type": "string",
+            "description": "Decimal serialised as a string",
+            "example": "49.00"
+          },
+          "planType": {
+            "type": "string",
+            "enum": [
+              "FREE",
+              "PRO",
+              "ENTERPRISE"
+            ]
+          },
+          "features": {
+            "type": "object"
+          },
+          "limits": {
+            "type": "object",
+            "description": "Metric limits; a missing metric means unlimited",
+            "example": {
+              "API_CALLS": 500000,
+              "STORAGE_GB": 100,
+              "SEATS": 10
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "priceUSD",
+          "planType",
+          "features",
+          "limits",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "CreatePlanDto": {
         "type": "object",
@@ -1359,6 +2176,67 @@
           }
         }
       },
+      "SubscriptionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "planId": {
+            "type": "string"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "renewalDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "canceledAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "currentBillingPeriodStart": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "currentBillingPeriodEnd": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "PAST_DUE",
+              "SUSPENDED",
+              "CANCELED"
+            ]
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SubscriptionPlanDto"
+          },
+          "user": {
+            "$ref": "#/components/schemas/PublicUserDto"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "planId",
+          "startDate",
+          "renewalDate",
+          "canceledAt",
+          "currentBillingPeriodStart",
+          "currentBillingPeriodEnd",
+          "status"
+        ]
+      },
       "SelectPlanDto": {
         "type": "object",
         "properties": {
@@ -1385,6 +2263,102 @@
           "newPlanId"
         ]
       },
+      "InvoiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subscriptionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "example": "49.00"
+          },
+          "stripeInvoiceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "paidDate": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "billingPeriodStart": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "billingPeriodEnd": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "dueDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "SENT",
+              "PAID",
+              "FAILED",
+              "OVERDUE"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "subscriptionId",
+          "userId",
+          "amount",
+          "stripeInvoiceId",
+          "paidDate",
+          "billingPeriodStart",
+          "billingPeriodEnd",
+          "dueDate",
+          "status"
+        ]
+      },
+      "UpcomingInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "example": 49
+          },
+          "dueDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "billingPeriodStart": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "billingPeriodEnd": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "planName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subscriptionId",
+          "amount",
+          "dueDate",
+          "billingPeriodStart",
+          "billingPeriodEnd",
+          "planName"
+        ]
+      },
       "TrackUsageDto": {
         "type": "object",
         "properties": {
@@ -1407,6 +2381,299 @@
         "required": [
           "metricType",
           "amount"
+        ]
+      },
+      "UsageLogDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subscriptionId": {
+            "type": "string"
+          },
+          "metricType": {
+            "type": "string",
+            "enum": [
+              "API_CALLS",
+              "STORAGE_GB",
+              "SEATS"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "example": 412500
+          },
+          "period": {
+            "type": "string",
+            "example": "2026-09"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "subscriptionId",
+          "metricType",
+          "amount",
+          "period",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "MetricUsageDto": {
+        "type": "object",
+        "properties": {
+          "metricType": {
+            "type": "string",
+            "enum": [
+              "API_CALLS",
+              "STORAGE_GB",
+              "SEATS"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "example": 412500
+          },
+          "period": {
+            "type": "string",
+            "example": "2026-09"
+          }
+        },
+        "required": [
+          "metricType",
+          "amount",
+          "period"
+        ]
+      },
+      "LimitCheckDto": {
+        "type": "object",
+        "properties": {
+          "metricType": {
+            "type": "string",
+            "enum": [
+              "API_CALLS",
+              "STORAGE_GB",
+              "SEATS"
+            ]
+          },
+          "limit": {
+            "type": "number",
+            "nullable": true,
+            "description": "null means the plan does not cap this metric"
+          },
+          "consumed": {
+            "type": "number",
+            "example": 412500
+          },
+          "remainingQuota": {
+            "type": "number",
+            "nullable": true
+          },
+          "percentageUsed": {
+            "type": "number",
+            "example": 82.5
+          },
+          "isAllowed": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "metricType",
+          "limit",
+          "consumed",
+          "remainingQuota",
+          "percentageUsed",
+          "isAllowed"
+        ]
+      },
+      "BillingStatsDto": {
+        "type": "object",
+        "properties": {
+          "activeSubscriptions": {
+            "type": "number"
+          },
+          "totalSubscriptions": {
+            "type": "number"
+          },
+          "churnRate": {
+            "type": "string",
+            "example": "12.50%"
+          },
+          "paidInvoices": {
+            "type": "number"
+          },
+          "overdueInvoices": {
+            "type": "number"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "activeSubscriptions",
+          "totalSubscriptions",
+          "churnRate",
+          "paidInvoices",
+          "overdueInvoices",
+          "timestamp"
+        ]
+      },
+      "InvoiceStatsDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "paid": {
+            "type": "number"
+          },
+          "overdue": {
+            "type": "number"
+          },
+          "draft": {
+            "type": "number"
+          },
+          "paidPercentage": {
+            "type": "string",
+            "example": "66.67"
+          }
+        },
+        "required": [
+          "total",
+          "paid",
+          "overdue",
+          "draft",
+          "paidPercentage"
+        ]
+      },
+      "CycleRunSummaryDto": {
+        "type": "object",
+        "properties": {
+          "examined": {
+            "type": "number",
+            "example": 3
+          },
+          "changed": {
+            "type": "number",
+            "example": 2
+          },
+          "skipped": {
+            "type": "number",
+            "example": 1
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "examined",
+          "changed",
+          "skipped",
+          "details"
+        ]
+      },
+      "CycleRunAllDto": {
+        "type": "object",
+        "properties": {
+          "renewal": {
+            "$ref": "#/components/schemas/CycleRunSummaryDto"
+          },
+          "overdue": {
+            "$ref": "#/components/schemas/CycleRunSummaryDto"
+          }
+        },
+        "required": [
+          "renewal",
+          "overdue"
+        ]
+      },
+      "PaymentMethodDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "last4Digits": {
+            "type": "string",
+            "example": "4242"
+          },
+          "expiryMonth": {
+            "type": "number",
+            "example": 12
+          },
+          "expiryYear": {
+            "type": "number",
+            "example": 2028
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "last4Digits",
+          "expiryMonth",
+          "expiryYear",
+          "isDefault",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreatePaymentMethodDto": {
+        "type": "object",
+        "properties": {
+          "stripeToken": {
+            "type": "string",
+            "example": "tok_visa",
+            "description": "Processor token from the client-side integration. Card data never reaches this API."
+          },
+          "last4Digits": {
+            "type": "string",
+            "example": "4242"
+          },
+          "expiryMonth": {
+            "type": "number",
+            "example": 12
+          },
+          "expiryYear": {
+            "type": "number",
+            "example": 2028
+          },
+          "isDefault": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "stripeToken",
+          "last4Digits",
+          "expiryMonth",
+          "expiryYear"
         ]
       }
     }
