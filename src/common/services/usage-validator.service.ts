@@ -1,58 +1,57 @@
 import { Injectable } from '@nestjs/common';
+import { UsageMetricType } from 'generated/prisma/client';
 
-interface PlanLimits {
-    [key: string]: number;
+export const UNLIMITED = null;
+
+export interface LimitCheck {
+    metricType: UsageMetricType;
+    limit: number | null;
+    consumed: number;
+    remainingQuota: number | null;
+    percentageUsed: number;
+    isAllowed: boolean;
 }
+
+const NEAR_LIMIT_PERCENT = 80;
+const FULL = 100;
 
 @Injectable()
 export class UsageValidatorService {
-    validateUsageAgainstLimit(
-        currentUsage: number,
-        planLimit: number,
-    ): {
-        isAllowed: boolean;
-        remainingQuota: number;
-        percentageUsed: number;
-    } {
-        const percentageUsed = (currentUsage / planLimit) * 100;
-        const remainingQuota = Math.max(0, planLimit - currentUsage);
+    limitFor(limits: unknown, metricType: UsageMetricType): number | null {
+        if (!limits || typeof limits !== 'object') return UNLIMITED;
+
+        const value = (limits as Record<string, unknown>)[metricType];
+
+        return typeof value === 'number' && value > 0 ? value : UNLIMITED;
+    }
+
+    check(
+        metricType: UsageMetricType,
+        limit: number | null,
+        consumed: number,
+    ): LimitCheck {
+        if (limit === UNLIMITED) {
+            return {
+                metricType,
+                limit: UNLIMITED,
+                consumed,
+                remainingQuota: UNLIMITED,
+                percentageUsed: 0,
+                isAllowed: true,
+            };
+        }
 
         return {
-            isAllowed: currentUsage <= planLimit,
-            remainingQuota,
-            percentageUsed,
+            metricType,
+            limit,
+            consumed,
+            remainingQuota: Math.max(0, limit - consumed),
+            percentageUsed: (consumed / limit) * FULL,
+            isAllowed: consumed <= limit,
         };
     }
 
-    checkUsageThreshold(
-        currentUsage: number,
-        planLimit: number,
-        thresholdPercentage: number = 80,
-    ): boolean {
-        const percentageUsed = (currentUsage / planLimit) * 100;
-        return percentageUsed >= thresholdPercentage;
-    }
-
-    extractLimitsFromPlanFeatures(features: any): PlanLimits {
-        if (!features || typeof features !== 'object') return {};
-        const typedFeatures = features as Record<string, number>;
-        return {
-            apiCalls: typedFeatures.apiCalls || 10000,
-            storage: typedFeatures.storage || 5,
-            seats: typedFeatures.seats || 1,
-        };
-    }
-
-    calculateUsagePercentage(current: number, limit: number): number {
-        if (limit === 0) return 0;
-        return Math.min((current / limit) * 100, 100);
-    }
-
-    isNearLimit(
-        current: number,
-        limit: number,
-        threshold: number = 0.8,
-    ): boolean {
-        return current >= limit * threshold;
+    isNearLimit(check: LimitCheck, threshold = NEAR_LIMIT_PERCENT): boolean {
+        return check.limit !== UNLIMITED && check.percentageUsed >= threshold;
     }
 }
