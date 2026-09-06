@@ -14,6 +14,8 @@ import { InvoicesService } from './invoices.service';
 import { InvoiceQueryDto } from './dto';
 import { JwtAuthGuard } from '@core/auth/guards';
 import { CurrentUser } from '@core/auth/decorators';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { InvoiceDto, UpcomingInvoiceDto } from '@common/dto';
 
 type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
     include: { subscription: { include: { plan: true } }; user: true };
@@ -27,6 +29,7 @@ export class InvoicesController {
     constructor(private invoicesService: InvoicesService) {}
 
     @ApiOperation({ summary: 'Get user invoices' })
+    @ApiOkResponse({ type: InvoiceDto, isArray: true })
     @Get()
     async getInvoices(
         @CurrentUser('id') userId: string,
@@ -36,6 +39,7 @@ export class InvoicesController {
     }
 
     @ApiOperation({ summary: 'Get invoice by ID' })
+    @ApiOkResponse({ type: InvoiceDto })
     @Get(':id')
     async getInvoiceById(
         @CurrentUser('id') userId: string,
@@ -45,10 +49,9 @@ export class InvoicesController {
     }
 
     @ApiOperation({ summary: 'Get upcoming invoice estimate' })
+    @ApiOkResponse({ type: UpcomingInvoiceDto })
     @Get('upcoming/estimate')
-    async getUpcomingInvoice(
-        @CurrentUser('id') userId: string,
-    ): Promise<{
+    async getUpcomingInvoice(@CurrentUser('id') userId: string): Promise<{
         subscriptionId: string;
         amount: number;
         dueDate: Date;
@@ -60,6 +63,7 @@ export class InvoicesController {
     }
 
     @ApiOperation({ summary: 'Mark invoice as paid' })
+    @ApiOkResponse({ type: InvoiceDto })
     @Post(':id/mark-paid')
     @HttpCode(HttpStatus.OK)
     async markInvoicePaid(

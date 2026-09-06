@@ -4,6 +4,8 @@ import { UserRole } from 'generated/prisma/enums';
 import { AdminService, AdminStats } from './admin.service';
 import { JwtAuthGuard, RolesGuard } from '@core/auth/guards';
 import { Roles } from '@core/auth/decorators';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { AdminStatsDto } from '@common/dto';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -13,6 +15,7 @@ import { Roles } from '@core/auth/decorators';
 export class AdminController {
     constructor(private readonly adminService: AdminService) {}
 
+    @ApiOkResponse({ type: AdminStatsDto })
     @Get('stats')
     @ApiOperation({ summary: 'Platform-wide account and billing counters' })
     getStats(): Promise<AdminStats> {
