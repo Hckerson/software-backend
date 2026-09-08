@@ -19,12 +19,16 @@ import {
     OnboardingDto,
     ResetPasswordDto,
     ForgotPasswordDto,
+    AuthResponseDto,
 } from './dto';
+import { MessageDto } from '@common/dto';
 import {
     ApiTags,
     ApiResponse,
     ApiOperation,
+    ApiOkResponse,
     ApiBearerAuth,
+    ApiCreatedResponse,
 } from '@nestjs/swagger';
 import type { RequestWithUser } from '@common/interfaces/req';
 
@@ -35,8 +39,8 @@ export class AuthController {
 
     @Post('register')
     @ApiOperation({ summary: 'Register a new user' })
-    @ApiResponse({
-        status: 201,
+    @ApiCreatedResponse({
+        type: AuthResponseDto,
         description:
             'User successfully registered. Returns user + accessToken.',
     })
@@ -55,7 +59,7 @@ export class AuthController {
     @Post('login')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Login and get JWT token' })
-    @ApiResponse({ status: 200, description: 'Login successful' })
+    @ApiOkResponse({ type: AuthResponseDto, description: 'Login successful' })
     @ApiResponse({ status: 401, description: 'Invalid credentials' })
     async login(
         @Body() dto: LoginDto,
@@ -71,6 +75,7 @@ export class AuthController {
     @Post('logout')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Clear the session cookie' })
+    @ApiOkResponse({ type: MessageDto })
     @ApiResponse({ status: 200, description: 'Session cleared' })
     logout(@Res({ passthrough: true }) response: Response) {
         clearAuthCookie(response);
@@ -83,17 +88,15 @@ export class AuthController {
     @Post('forgot-password')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Request a password reset' })
+    @ApiOkResponse({ type: MessageDto })
     forgotPassword(@Body() dto: ForgotPasswordDto) {
-        void dto;
-        // Wire up your email provider here to deliver a reset token.
-        return {
-            message: 'If the email exists, reset instructions were sent.',
-        };
+        return this.authService.forgotPassword(dto.email);
     }
 
     @Post('reset-password')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Reset password' })
+    @ApiOkResponse({ type: MessageDto })
     async resetPassword(@Body() dto: ResetPasswordDto) {
         return this.authService.resetPassword(dto);
     }
@@ -105,6 +108,7 @@ export class AuthController {
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Complete profile onboarding' })
+    @ApiOkResponse({ type: MessageDto })
     async onboarding(
         @Body() dto: OnboardingDto,
         @Request() req: RequestWithUser,

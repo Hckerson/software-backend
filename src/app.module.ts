@@ -12,6 +12,8 @@ import { SubscriptionsModule } from '@core/subscriptions/subscriptions.module';
 import { InvoicesModule } from '@core/invoices/invoices.module';
 import { UsageModule } from '@core/usage/usage.module';
 import { BillingModule } from '@core/billing/billing.module';
+import { CycleModule } from '@core/cycle/cycle.module';
+import { PaymentMethodsModule } from '@core/payment-methods/payment-methods.module';
 
 @Module({
     imports: [
@@ -26,6 +28,8 @@ import { BillingModule } from '@core/billing/billing.module';
         InvoicesModule,
         UsageModule,
         BillingModule,
+        CycleModule,
+        PaymentMethodsModule,
     ],
     controllers: [AppController],
     providers: [AppService],

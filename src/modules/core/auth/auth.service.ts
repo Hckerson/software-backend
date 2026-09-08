@@ -1,9 +1,19 @@
+import { Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { RESET_DELIVERY, type ResetDelivery } from './reset/reset-delivery';
+import {
+    RESET_PURPOSE,
+    RESET_TOKEN_TTL,
+    isResetToken,
+    wasIssuedBefore,
+    type ResetTokenPayload,
+} from './reset/reset-token';
 import { Prisma, User } from 'generated/prisma/client';
 import { UserRole } from 'generated/prisma/enums';
 import { PasswordUtil } from './utils/password.util';
 import { metricBuilder } from 'src/lib/metric-builder';
-import { UsersService } from '@core/users/users.service';
+import { UsersService, type PublicUser } from '@core/users/users.service';
 import type { AuthResponse, JwtPayload } from './types/auth.types';
 import { LoginDto, RegisterDto, ResetPasswordDto, OnboardingDto } from './dto';
 
@@ -18,6 +28,9 @@ export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly usersService: UsersService,
+        private readonly config: ConfigService,
+        @Inject(RESET_DELIVERY)
+        private readonly resetDelivery: ResetDelivery,
     ) {}
 
     // ─── Registration & Login ──────────────────────────────────────────────────
@@ -47,18 +60,56 @@ export class AuthService {
 
     // ─── Password & Profile ─────────────────────────────────────────────────────
 
-    async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
-        try {
-            const payload: JwtPayload = this.jwtService.verify(dto.token);
-            const user = await this.usersService.findByEmail(payload.email);
-            if (!user) throw new UnauthorizedException('Invalid token');
+    async forgotPassword(email: string): Promise<{ message: string }> {
+        const user = await this.usersService.findByEmail(email);
 
-            const passwordHash = await PasswordUtil.hash(dto.password);
-            await this.usersService.update(user.id, { passwordHash });
-            return { message: 'Password reset successful.' };
+        if (user) {
+            const token = this.jwtService.sign(
+                { sub: user.id, email: user.email, purpose: RESET_PURPOSE },
+                { expiresIn: RESET_TOKEN_TTL },
+            );
+            const base =
+                this.config.get<string>('FRONTEND_URL') ??
+                'http://localhost:3000';
+
+            await this.resetDelivery.send(
+                user.email,
+                `${base}/auth/reset-password?token=${token}`,
+            );
+        }
+
+        return {
+            message: 'If the email exists, reset instructions were sent.',
+        };
+    }
+
+    async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+        let payload: ResetTokenPayload;
+
+        try {
+            payload = this.jwtService.verify<ResetTokenPayload>(dto.token);
         } catch {
             throw new UnauthorizedException('Invalid or expired token.');
         }
+
+        if (!isResetToken(payload)) {
+            throw new UnauthorizedException('Invalid or expired token.');
+        }
+
+        const user = await this.usersService.findByEmail(payload.email);
+
+        if (!user || wasIssuedBefore(payload.iat, user.passwordResetAt)) {
+            throw new UnauthorizedException('Invalid or expired token.');
+        }
+
+        const passwordHash = await PasswordUtil.hash(dto.password);
+
+        await this.usersService.updateCredentials(user.id, {
+            passwordHash,
+            passwordResetAt: new Date(),
+        });
+
+        return { message: 'Password reset successful.' };
     }
 
     async onboarding(
@@ -77,7 +128,7 @@ export class AuthService {
 
     // ─── Helpers ────────────────────────────────────────────────────────────────
 
-    private toAuthUser(user: User) {
+    private toAuthUser(user: PublicUser) {
         return {
             id: user.id,
             name: user.fullName,

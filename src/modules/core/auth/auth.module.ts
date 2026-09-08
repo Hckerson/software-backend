@@ -8,6 +8,7 @@ import { UsersModule } from '@core/users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaService } from '@common/database/prisma.service';
 import { JWT_ALGORITHM, privateKeyFrom, publicKeyFrom } from './auth.keys';
+import { RESET_DELIVERY, LoggingResetDelivery } from './reset/reset-delivery';
 
 @Module({
     imports: [
@@ -26,7 +27,12 @@ import { JWT_ALGORITHM, privateKeyFrom, publicKeyFrom } from './auth.keys';
             }),
         }),
     ],
-    providers: [AuthService, JwtStrategy, PrismaService],
+    providers: [
+        AuthService,
+        JwtStrategy,
+        PrismaService,
+        { provide: RESET_DELIVERY, useClass: LoggingResetDelivery },
+    ],
     controllers: [AuthController],
     exports: [AuthService],
 })

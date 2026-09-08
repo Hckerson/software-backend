@@ -13,6 +13,8 @@ import { SubscriptionsService } from './subscriptions.service';
 import { SelectPlanDto, ChangePlanDto } from './dto';
 import { JwtAuthGuard } from '@core/auth/guards';
 import { CurrentUser } from '@core/auth/decorators';
+import { ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { SubscriptionDto } from '@common/dto';
 
 type SubscriptionWithRelations = Prisma.SubscriptionGetPayload<{
     include: { plan: true; user: true };
@@ -26,6 +28,7 @@ export class SubscriptionsController {
     constructor(private subscriptionsService: SubscriptionsService) {}
 
     @ApiOperation({ summary: 'Get current active subscription' })
+    @ApiOkResponse({ type: SubscriptionDto })
     @Get('current')
     async getCurrentSubscription(
         @CurrentUser('id') userId: string,
@@ -34,6 +37,7 @@ export class SubscriptionsController {
     }
 
     @ApiOperation({ summary: 'Get subscription history' })
+    @ApiOkResponse({ type: SubscriptionDto, isArray: true })
     @Get('history')
     async getSubscriptionHistory(
         @CurrentUser('id') userId: string,
@@ -42,6 +46,7 @@ export class SubscriptionsController {
     }
 
     @ApiOperation({ summary: 'Select plan at signup' })
+    @ApiCreatedResponse({ type: SubscriptionDto })
     @Post('select-plan')
     @HttpCode(HttpStatus.CREATED)
     async selectPlan(
@@ -55,6 +60,7 @@ export class SubscriptionsController {
     }
 
     @ApiOperation({ summary: 'Change to different plan' })
+    @ApiOkResponse({ type: SubscriptionDto })
     @Post('change-plan')
     async changePlan(
         @CurrentUser('id') userId: string,
@@ -64,6 +70,7 @@ export class SubscriptionsController {
     }
 
     @ApiOperation({ summary: 'Cancel subscription' })
+    @ApiOkResponse({ type: SubscriptionDto })
     @Post('cancel')
     async cancelSubscription(
         @CurrentUser('id') userId: string,
@@ -72,6 +79,7 @@ export class SubscriptionsController {
     }
 
     @ApiOperation({ summary: 'Reactivate subscription' })
+    @ApiOkResponse({ type: SubscriptionDto })
     @Post('reactivate')
     async reactivateSubscription(
         @CurrentUser('id') userId: string,
