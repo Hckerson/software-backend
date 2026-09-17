@@ -125,22 +125,19 @@ The emitter runs from compiled output on purpose — esbuild-based runners (`tsx
 
 ## Before you commit or push
 
-These commands run at the commit or push boundary only — not after every edit.
+Prettier owns formatting — never override it by hand. Lint violations are fixed, never suppressed.
 
-1. `pnpm format` — Prettier owns formatting. Never override it by hand.
-2. `pnpm lint` — zero warnings. Fix every violation; never suppress one.
-3. `pnpm type-check` — strict, zero errors.
-4. `pnpm build` — must succeed.
-5. `pnpm openapi` — if any DTO, route, or `@ApiProperty` changed, regenerate and commit `openapi.json`.
+`pnpm format`, `pnpm lint`, `pnpm type-check` and `pnpm build` are available for a manual sweep; run them only when asked. No Husky hooks are installed in this repo, so nothing gates a commit or push automatically.
+
+- **OpenAPI** — if any DTO, route, or `@ApiProperty` changed, run `pnpm openapi` and commit `openapi.json`.
 
 ## Pre-merge checklist
 
-1. Type check, lint, and build all clean.
-2. No `any` in services, no `console.log`, no dead code or stubs.
-3. No comments in code. No inline type/lint rule suppressions (`// @ts-ignore`, `// eslint-disable`, `as any`, etc.).
-4. No hardcoded config, secrets, or magic values (all in env, enums, or constants).
-5. Reused existing repos, guards, filters, and the global interceptor. Nothing reinvented.
-6. Followed the layer contracts. Repos stayed thin. Matched the `users` module pattern exactly.
+1. No `any` in services, no `console.log`, no dead code or stubs.
+2. No comments in code. No inline type/lint rule suppressions (`// @ts-ignore`, `// eslint-disable`, `as any`, etc.).
+3. No hardcoded config, secrets, or magic values (all in env, enums, or constants).
+4. Reused existing repos, guards, filters, and the global interceptor. Nothing reinvented.
+5. Followed the layer contracts. Repos stayed thin. Matched the `users` module pattern exactly.
 
 **Do not merge if any check fails.**
 
