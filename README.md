@@ -67,15 +67,28 @@ $ pnpm run start:prod
 ## Run tests
 
 ```bash
-# unit tests
-$ pnpm run test
+# unit tests — no database needed
+$ pnpm test
 
-# e2e tests
-$ pnpm run test:e2e
+# integration tests — needs Postgres; creates meter_test the first time
+$ pnpm test:e2e:setup
+$ pnpm test:e2e
 
 # test coverage
-$ pnpm run test:cov
+$ pnpm test:cov
 ```
+
+`test:e2e:setup` starts the `db` service, creates a **separate `meter_test`
+database** and pushes the schema plus the partial unique index into it. The
+cycle suite truncates every table between tests, so it must never point at the
+development database — override with `TEST_DATABASE_URL` if you need a
+different target.
+
+Two things the e2e config needs and the unit config already had:
+`moduleNameMapper` for the tsconfig aliases and the generated client's
+ESM-style `.js` specifiers, and `--experimental-vm-modules`, because the Prisma
+driver adapter loads over a dynamic import that Jest's CJS VM otherwise
+refuses.
 
 ## Deployment
 
