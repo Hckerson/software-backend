@@ -1,6 +1,11 @@
 import { ForbiddenException } from '@nestjs/common';
-import { UserRole } from 'generated/prisma/enums';
-import { assertCanActOn, isAdmin, scopeUpdate } from './users.access';
+import { UserAccountStatus, UserRole } from 'generated/prisma/enums';
+import {
+    assertCanActOn,
+    assertNotSelfPrivileged,
+    isAdmin,
+    scopeUpdate,
+} from './users.access';
 import type { AuthUser } from '@core/auth/types/auth.types';
 
 const customer: AuthUser = {
@@ -62,6 +67,36 @@ describe('scopeUpdate', () => {
         const dto = { role: UserRole.ADMIN };
 
         expect(scopeUpdate(admin, dto)).toEqual(dto);
+    });
+});
+
+describe('assertNotSelfPrivileged', () => {
+    it('stops an admin suspending their own account', () => {
+        expect(() =>
+            assertNotSelfPrivileged(admin, admin.id, {
+                status: UserAccountStatus.SUSPENDED,
+            }),
+        ).toThrow(ForbiddenException);
+    });
+
+    it('stops an admin demoting themselves', () => {
+        expect(() =>
+            assertNotSelfPrivileged(admin, admin.id, { role: UserRole.USER }),
+        ).toThrow(ForbiddenException);
+    });
+
+    it('lets an admin suspend someone else', () => {
+        expect(() =>
+            assertNotSelfPrivileged(admin, customer.id, {
+                status: UserAccountStatus.SUSPENDED,
+            }),
+        ).not.toThrow();
+    });
+
+    it('lets anyone edit their own ordinary profile fields', () => {
+        expect(() =>
+            assertNotSelfPrivileged(admin, admin.id, { fullName: 'Ada L.' }),
+        ).not.toThrow();
     });
 });
 
