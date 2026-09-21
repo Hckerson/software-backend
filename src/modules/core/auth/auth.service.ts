@@ -9,7 +9,7 @@ import {
     wasIssuedBefore,
     type ResetTokenPayload,
 } from './reset/reset-token';
-import { Prisma, User } from 'generated/prisma/client';
+import { Prisma } from 'generated/prisma/client';
 import { UserRole } from 'generated/prisma/enums';
 import { PasswordUtil } from './utils/password.util';
 import { metricBuilder } from 'src/lib/metric-builder';
@@ -19,12 +19,15 @@ import { LoginDto, RegisterDto, ResetPasswordDto, OnboardingDto } from './dto';
 
 import {
     Injectable,
+    Logger,
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         private readonly jwtService: JwtService,
         private readonly usersService: UsersService,
@@ -72,10 +75,16 @@ export class AuthService {
                 this.config.get<string>('FRONTEND_URL') ??
                 'http://localhost:3000';
 
-            await this.resetDelivery.send(
-                user.email,
-                `${base}/auth/reset-password?token=${token}`,
-            );
+            // A delivery failure must not change the response: propagating it
+            // would make a 500 mean "this email exists" and undo E4.
+            try {
+                await this.resetDelivery.send(
+                    user.email,
+                    `${base}/auth/reset-password?token=${token}`,
+                );
+            } catch (cause) {
+                this.logger.error('Reset delivery failed', cause);
+            }
         }
 
         return {
