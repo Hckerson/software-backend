@@ -1317,7 +1317,17 @@
     "/api/admin/billing/cycle/run": {
       "post": {
         "operationId": "CycleController_runAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Cycle-Token",
+            "in": "header",
+            "description": "Shared secret from CYCLE_TRIGGER_TOKEN, for an external scheduler. Without it, an admin session is required.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
