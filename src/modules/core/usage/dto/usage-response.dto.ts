@@ -34,6 +34,21 @@ export class LimitCheckDto {
 
     @ApiProperty({ example: true })
     isAllowed: boolean;
+
+    @ApiProperty({
+        type: Number,
+        nullable: true,
+        example: 0.0002,
+        description:
+            'Price per unit beyond the limit. null means this metric is a hard cap.',
+    })
+    overageRate: number | null;
+
+    @ApiProperty({ example: 12500, description: 'Units beyond the limit' })
+    overageUnits: number;
+
+    @ApiProperty({ example: 2.5, description: 'overageUnits x overageRate' })
+    overageCharge: number;
 }
 
 export class UsageLogDto {

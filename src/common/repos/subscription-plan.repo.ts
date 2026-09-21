@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
-import { Prisma, PlanType } from 'generated/prisma/client';
+import { Prisma } from 'generated/prisma/client';
 import { PrismaService } from '@common/database/prisma.service';
 import { RepositoryError } from '../errors/repo.error';
 

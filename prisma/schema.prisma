@@ -121,6 +121,7 @@ model SubscriptionPlan {
   priceUSD    Decimal  @db.Decimal(10, 2)
   features    Json
   limits      Json
+  overageRates Json    @default("{}")
   isActive    Boolean  @default(true)
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())

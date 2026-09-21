@@ -1,21 +1,11 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import {
-    InvoiceStatus,
-    Prisma,
-    SubscriptionStatus,
-} from 'generated/prisma/client';
+import { InvoiceStatus, SubscriptionStatus } from 'generated/prisma/client';
 import { InvoiceRepo } from '@common/repos/invoice.repo';
 import { SubscriptionRepo } from '@common/repos/subscription.repo';
-import { UsageLogRepo } from '@common/repos/usage-log.repo';
 import { BillingAuditRepo } from '@common/repos/billing-audit.repo';
 import { BillingCycleService } from '@common/services/billing-cycle.service';
 import { InvoiceGeneratorService } from '@common/services/invoice-generator.service';
-import { UsageValidatorService } from '@common/services/usage-validator.service';
-import { METRIC_TYPES } from '@core/usage/usage.service';
-
-type SubscriptionWithPlan = Prisma.SubscriptionGetPayload<{
-    include: { plan: true };
-}>;
+import { OverageCalculatorService } from '@common/services/overage-calculator.service';
 
 export interface CycleRunSummary {
     examined: number;
@@ -24,8 +14,6 @@ export interface CycleRunSummary {
     details: string[];
 }
 
-const NO_OVERAGE_RATE = 0;
-
 @Injectable()
 export class CycleService {
     private readonly logger = new Logger(CycleService.name);
@@ -33,41 +21,11 @@ export class CycleService {
     constructor(
         private invoiceRepo: InvoiceRepo,
         private subscriptionRepo: SubscriptionRepo,
-        private usageLogRepo: UsageLogRepo,
         private auditRepo: BillingAuditRepo,
         private billingCycle: BillingCycleService,
         private invoiceGenerator: InvoiceGeneratorService,
-        private usageValidator: UsageValidatorService,
+        private overageCalculator: OverageCalculatorService,
     ) {}
-
-    private async overageFor(
-        subscription: SubscriptionWithPlan,
-        period: string,
-    ): Promise<number> {
-        let total = NO_OVERAGE_RATE;
-
-        for (const metricType of METRIC_TYPES) {
-            const limit = this.usageValidator.limitFor(
-                subscription.plan.limits,
-                metricType,
-            );
-
-            if (limit === null) continue;
-
-            const used = await this.usageLogRepo.aggregate({
-                where: { subscriptionId: subscription.id, metricType, period },
-                _sum: { amount: true },
-            });
-
-            total += this.invoiceGenerator.calculateOverageCharge(
-                used._sum?.amount ?? 0,
-                limit,
-                NO_OVERAGE_RATE,
-            );
-        }
-
-        return total;
-    }
 
     async issueInvoiceForPeriod(subscriptionId: string) {
         const subscription = await this.subscriptionRepo.findUnique({
@@ -95,7 +53,10 @@ export class CycleService {
             subscriptionId,
             userId: subscription.userId,
             planPrice: subscription.plan.priceUSD,
-            overageAmount: await this.overageFor(subscription, period),
+            overageAmount: await this.overageCalculator.totalFor(
+                subscription,
+                period,
+            ),
             billingPeriodStart,
             billingPeriodEnd,
         });

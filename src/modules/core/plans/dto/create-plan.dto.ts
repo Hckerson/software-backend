@@ -49,4 +49,14 @@ export class CreatePlanDto {
     @IsObject()
     @IsNotEmpty()
     limits: Record<string, any>;
+
+    @ApiProperty({
+        description:
+            'Price per unit beyond each limit. A metric listed here may exceed its limit and is billed for the excess; a metric left out is a hard cap.',
+        example: { API_CALLS: 0.0002 },
+        required: false,
+    })
+    @IsObject()
+    @IsOptional()
+    overageRates?: Record<string, number>;
 }

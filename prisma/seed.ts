@@ -10,8 +10,18 @@ const prisma = new PrismaClient({
 
 const DAYS = [Day.SUN, Day.MON, Day.TUE, Day.WED, Day.THU, Day.FRI, Day.SAT];
 const MONTHS = [
-    Month.JAN, Month.FEB, Month.MAR, Month.APR, Month.MAY, Month.JUN,
-    Month.JUL, Month.AUG, Month.SEP, Month.OCT, Month.NOV, Month.DEC,
+    Month.JAN,
+    Month.FEB,
+    Month.MAR,
+    Month.APR,
+    Month.MAY,
+    Month.JUN,
+    Month.JUL,
+    Month.AUG,
+    Month.SEP,
+    Month.OCT,
+    Month.NOV,
+    Month.DEC,
 ];
 
 const stamp = (date: Date) => ({
@@ -36,6 +46,7 @@ const PLANS = [
         priceUSD: 0,
         description: 'For trying things out.',
         limits: { API_CALLS: 10_000, STORAGE_GB: 1, SEATS: 1 },
+        overageRates: {},
         features: { emailSupport: true, sla: false },
     },
     {
@@ -44,6 +55,7 @@ const PLANS = [
         priceUSD: 49,
         description: 'For teams shipping to production.',
         limits: { API_CALLS: 500_000, STORAGE_GB: 100, SEATS: 10 },
+        overageRates: { API_CALLS: 0.0002, STORAGE_GB: 0.5 },
         features: { emailSupport: true, prioritySupport: true, sla: '99.9%' },
     },
     {
@@ -52,7 +64,13 @@ const PLANS = [
         priceUSD: 499,
         description: 'Unlimited scale with a support contract.',
         limits: {},
-        features: { emailSupport: true, prioritySupport: true, sla: '99.99%', sso: true },
+        overageRates: {},
+        features: {
+            emailSupport: true,
+            prioritySupport: true,
+            sla: '99.99%',
+            sso: true,
+        },
     },
 ];
 
@@ -120,11 +138,36 @@ async function main() {
 
     await prisma.usageLog.createMany({
         data: [
-            { subscriptionId: subscription.id, metricType: 'API_CALLS', amount: 412_500, period: periodKey(periodStart) },
-            { subscriptionId: subscription.id, metricType: 'STORAGE_GB', amount: 78, period: periodKey(periodStart) },
-            { subscriptionId: subscription.id, metricType: 'SEATS', amount: 10, period: periodKey(periodStart) },
-            { subscriptionId: subscription.id, metricType: 'API_CALLS', amount: 288_000, period: periodKey(shiftMonths(periodStart, -1)) },
-            { subscriptionId: subscription.id, metricType: 'STORAGE_GB', amount: 61, period: periodKey(shiftMonths(periodStart, -1)) },
+            {
+                subscriptionId: subscription.id,
+                metricType: 'API_CALLS',
+                amount: 412_500,
+                period: periodKey(periodStart),
+            },
+            {
+                subscriptionId: subscription.id,
+                metricType: 'STORAGE_GB',
+                amount: 78,
+                period: periodKey(periodStart),
+            },
+            {
+                subscriptionId: subscription.id,
+                metricType: 'SEATS',
+                amount: 10,
+                period: periodKey(periodStart),
+            },
+            {
+                subscriptionId: subscription.id,
+                metricType: 'API_CALLS',
+                amount: 288_000,
+                period: periodKey(shiftMonths(periodStart, -1)),
+            },
+            {
+                subscriptionId: subscription.id,
+                metricType: 'STORAGE_GB',
+                amount: 61,
+                period: periodKey(shiftMonths(periodStart, -1)),
+            },
         ],
     });
 

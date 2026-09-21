@@ -38,26 +38,26 @@ Never replace a derived artifact with `any`, `Record<>`, `as` assertions, or han
 
 ## Required patterns
 
-| Layer | Responsibility | Rules |
-|-------|---|---|
-| **Controller** | Extract route params + body, call service, return result. Add `@UseGuards(JwtAuthGuard)` + `@Roles()` for protected routes. | No business logic. No Prisma. No direct repo calls. |
-| **Service** | Accept DTOs, enforce business rules, throw `HttpException`s, call repo methods, return domain objects. | No raw Prisma models in responses. No `req`/`res` objects. Never throw `RepoError` directly. |
-| **Repository** | Wrap Prisma calls in `try/catch`, rethrow as `RepoError`. Use `Prisma.[Model]GetPayload<>` for typed results. | No business logic. Prisma only. Data access only. |
-| **DTO** | Use class-validator decorators for input validation at the boundary. `UpdateDto extends PartialType(CreateDto)`. | Type source for incoming data. Never used as response shape. |
-| **Module** | Import dependencies, declare controller + service, export service if shared. | DI wiring only. |
+| Layer          | Responsibility                                                                                                              | Rules                                                                                        |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Controller** | Extract route params + body, call service, return result. Add `@UseGuards(JwtAuthGuard)` + `@Roles()` for protected routes. | No business logic. No Prisma. No direct repo calls.                                          |
+| **Service**    | Accept DTOs, enforce business rules, throw `HttpException`s, call repo methods, return domain objects.                      | No raw Prisma models in responses. No `req`/`res` objects. Never throw `RepoError` directly. |
+| **Repository** | Wrap Prisma calls in `try/catch`, rethrow as `RepoError`. Use `Prisma.[Model]GetPayload<>` for typed results.               | No business logic. Prisma only. Data access only.                                            |
+| **DTO**        | Use class-validator decorators for input validation at the boundary. `UpdateDto extends PartialType(CreateDto)`.            | Type source for incoming data. Never used as response shape.                                 |
+| **Module**     | Import dependencies, declare controller + service, export service if shared.                                                | DI wiring only.                                                                              |
 
 ## Folder Structure
 
-| Route | Purpose |
-|-------|---------|
-| `/src/common/` | Shared infrastructure: repos, filters, guards, errors, enums, decorators, middleware. |
-| `/src/common/repos/` | Data access layer. One `[domain].repo.ts` per entity. Prisma only. |
-| `/src/common/errors/` | Error definitions and error filter. |
-| `/src/common/enums/` | Constants and enums. Single source of truth. |
-| `/src/common/decorators/` | Custom decorators (auth, roles, etc.). |
-| `/src/lib/` | Pure utility functions and helpers. No NestJS dependencies. |
-| `/src/modules/core/` | Domain-specific modules. One folder per domain with `dto/`, `*.service.ts`, `*.controller.ts`, `*.module.ts`. |
-| `/src/modules/core/auth/` | Authentication logic. Already implemented. Extend, don't reinvent. |
+| Route                     | Purpose                                                                                                       |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `/src/common/`            | Shared infrastructure: repos, filters, guards, errors, enums, decorators, middleware.                         |
+| `/src/common/repos/`      | Data access layer. One `[domain].repo.ts` per entity. Prisma only.                                            |
+| `/src/common/errors/`     | Error definitions and error filter.                                                                           |
+| `/src/common/enums/`      | Constants and enums. Single source of truth.                                                                  |
+| `/src/common/decorators/` | Custom decorators (auth, roles, etc.).                                                                        |
+| `/src/lib/`               | Pure utility functions and helpers. No NestJS dependencies.                                                   |
+| `/src/modules/core/`      | Domain-specific modules. One folder per domain with `dto/`, `*.service.ts`, `*.controller.ts`, `*.module.ts`. |
+| `/src/modules/core/auth/` | Authentication logic. Already implemented. Extend, don't reinvent.                                            |
 
 ## Workflow: Add a new domain
 
@@ -80,6 +80,15 @@ Never replace a derived artifact with `any`, `Record<>`, `as` assertions, or han
 - `common/filters/http-exception.filter.ts` transforms every error into standard HTTP shape.
 - `common/interceptors/response.interceptor.ts` standardizes every success response: `{ status, data, message }`.
 - Never build ad-hoc response wrappers or swallow errors without the filter.
+
+## Before you commit or push
+
+Formatting and linting are automated. They are not chores you run by hand.
+
+- **Commit** — Husky's `pre-commit` hook runs `pnpm lint-staged` and nothing else: `eslint --fix` then `prettier --write`, over staged files only. It is fast by design.
+- **Push** — Husky's `pre-push` hook runs `pnpm type-check`, then `pnpm lint`, and blocks on failure. This is the real gate.
+- **Build** — `pnpm build` must succeed. That one is on you.
+- **OpenAPI** — if any DTO, route, or `@ApiProperty` changed, run `pnpm openapi` and commit `openapi.json`.
 
 ## Pre-merge checklist
 

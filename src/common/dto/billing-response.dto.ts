@@ -39,6 +39,13 @@ export class SubscriptionPlanDto {
         example: { API_CALLS: 500000, STORAGE_GB: 100, SEATS: 10 },
     })
     limits: Record<string, number>;
+    @ApiProperty({
+        type: Object,
+        description:
+            'Price per unit beyond the limit, keyed by metric. A metric with no rate is a hard cap.',
+        example: { API_CALLS: 0.0002 },
+    })
+    overageRates: Record<string, number>;
     @ApiProperty() isActive: boolean;
     @ApiProperty() createdAt: Date;
     @ApiProperty() updatedAt: Date;
@@ -76,7 +83,18 @@ export class InvoiceDto {
 
 export class UpcomingInvoiceDto {
     @ApiProperty() subscriptionId: string;
-    @ApiProperty({ example: 49 }) amount: number;
+    @ApiProperty({
+        example: 51.5,
+        description: 'Plan price plus overage accrued so far this period',
+    })
+    amount: number;
+    @ApiProperty({ example: 49, description: 'Plan price alone' })
+    baseAmount: number;
+    @ApiProperty({
+        example: 2.5,
+        description: 'Overage accrued so far this period',
+    })
+    overageAmount: number;
     @ApiProperty() dueDate: Date;
     @ApiProperty() billingPeriodStart: Date;
     @ApiProperty() billingPeriodEnd: Date;

@@ -1,9 +1,18 @@
 {
-    "moduleFileExtensions": ["js", "json", "ts"],
-    "rootDir": ".",
-    "testEnvironment": "node",
-    "testRegex": ".e2e-spec.ts$",
-    "transform": {
-        "^.+\\.(t|j)s$": "ts-jest"
-    }
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "testTimeout": 30000,
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@core/(.*)$": "<rootDir>/../src/modules/core/$1",
+    "^@common/(.*)$": "<rootDir>/../src/common/$1",
+    "^@prisma-db/(.*)$": "<rootDir>/../src/common/database/$1",
+    "^generated/(.*)$": "<rootDir>/../generated/$1",
+    "^src/(.*)$": "<rootDir>/../src/$1",
+    "^(\\.{1,2}/.*)\\.js$": "$1"
+  }
 }
