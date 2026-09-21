@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AuthModule } from '@core/auth/auth.module';
 import { UsersModule } from '@core/users/users.module';
@@ -18,6 +19,7 @@ import { PaymentMethodsModule } from '@core/payment-methods/payment-methods.modu
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
+        ScheduleModule.forRoot(),
         PrismaModule,
         RepoModule,
         AuthModule,
