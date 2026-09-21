@@ -82,8 +82,17 @@ export class UsageService {
             subscription.plan.limits,
             metricType,
         );
+        const overageRate = this.usageValidator.overageRateFor(
+            subscription.plan.overageRates,
+            metricType,
+        );
 
-        return this.usageValidator.check(metricType, limit, consumed);
+        return this.usageValidator.check(
+            metricType,
+            limit,
+            consumed,
+            overageRate,
+        );
     }
 
     async trackUsage(
@@ -106,7 +115,7 @@ export class UsageService {
 
         if (!projected.isAllowed) {
             throw new BadRequestException(
-                `Usage limit exceeded for ${trackUsageDto.metricType}. Remaining quota: ${projected.remainingQuota ?? 0}`,
+                `Usage limit exceeded for ${trackUsageDto.metricType}. Remaining quota: ${projected.remainingQuota ?? 0}. This metric has no overage rate, so the limit is a hard cap.`,
             );
         }
 

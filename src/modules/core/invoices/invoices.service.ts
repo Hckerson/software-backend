@@ -11,6 +11,8 @@ import {
 import { InvoiceRepo } from '@common/repos/invoice.repo';
 import { SubscriptionRepo } from '@common/repos/subscription.repo';
 import { InvoiceQueryDto } from './dto';
+import { BillingCycleService } from '@common/services/billing-cycle.service';
+import { OverageCalculatorService } from '@common/services/overage-calculator.service';
 
 type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
     include: { subscription: { include: { plan: true } }; user: true };
@@ -21,6 +23,8 @@ export class InvoicesService {
     constructor(
         private invoiceRepo: InvoiceRepo,
         private subscriptionRepo: SubscriptionRepo,
+        private billingCycle: BillingCycleService,
+        private overageCalculator: OverageCalculatorService,
     ) {}
 
     async getInvoicesByUser(
@@ -55,6 +59,8 @@ export class InvoicesService {
     async getUpcomingInvoice(userId: string): Promise<{
         subscriptionId: string;
         amount: number;
+        baseAmount: number;
+        overageAmount: number;
         dueDate: Date;
         billingPeriodStart: Date;
         billingPeriodEnd: Date;
@@ -79,9 +85,18 @@ export class InvoicesService {
         const dueDate = new Date(subscription.currentBillingPeriodEnd);
         dueDate.setDate(dueDate.getDate() + 14);
 
+        const overageAmount = await this.overageCalculator.totalFor(
+            subscription,
+            this.billingCycle.formatPeriodKey(
+                subscription.currentBillingPeriodStart,
+            ),
+        );
+
         return {
             subscriptionId: subscription.id,
-            amount: basePriceUSD,
+            amount: basePriceUSD + overageAmount,
+            baseAmount: basePriceUSD,
+            overageAmount,
             dueDate,
             billingPeriodStart: subscription.currentBillingPeriodStart,
             billingPeriodEnd: subscription.currentBillingPeriodEnd,
