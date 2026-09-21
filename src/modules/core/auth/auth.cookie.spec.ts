@@ -15,11 +15,17 @@ const authService = {
     onboarding: jest.fn(),
 };
 
-const cookieHeader = (response: request.Response): string => {
-    const raw = response.headers['set-cookie'];
-    const list = Array.isArray(raw) ? raw : [raw];
+type SuperTestTarget = Parameters<typeof request>[0];
 
-    return list.find((value) => value?.startsWith(`${AUTH_COOKIE}=`)) ?? '';
+const cookieHeader = (response: request.Response): string => {
+    const raw: unknown = response.headers['set-cookie'];
+    const list: string[] = Array.isArray(raw)
+        ? (raw as string[])
+        : typeof raw === 'string'
+          ? [raw]
+          : [];
+
+    return list.find((value) => value.startsWith(`${AUTH_COOKIE}=`)) ?? '';
 };
 
 describe('auth session cookie', () => {
@@ -52,7 +58,7 @@ describe('auth session cookie', () => {
             accessToken: TOKEN,
         });
 
-        const response = await request(app.getHttpServer())
+        const response = await request(app.getHttpServer() as SuperTestTarget)
             .post('/auth/login')
             .send({ email: 'a@b.c', password: 'password123' })
             .expect(200);
@@ -71,7 +77,7 @@ describe('auth session cookie', () => {
             accessToken: TOKEN,
         });
 
-        const response = await request(app.getHttpServer())
+        const response = await request(app.getHttpServer() as SuperTestTarget)
             .post('/auth/register')
             .send({ fullName: 'A', email: 'a@b.c', password: 'password123' })
             .expect(201);
@@ -80,7 +86,7 @@ describe('auth session cookie', () => {
     });
 
     it('clears the cookie on logout', async () => {
-        const response = await request(app.getHttpServer())
+        const response = await request(app.getHttpServer() as SuperTestTarget)
             .post('/auth/logout')
             .expect(200);
 
