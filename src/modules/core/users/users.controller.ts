@@ -5,7 +5,11 @@ import { RolesGuard } from '@core/auth/guards/roles.guard';
 import { Roles } from '@core/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@core/auth/decorators/current-user.decorator';
-import { assertCanActOn, scopeUpdate } from './users.access';
+import {
+    assertCanActOn,
+    assertNotSelfPrivileged,
+    scopeUpdate,
+} from './users.access';
 import type { AuthUser } from '@core/auth/types/auth.types';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
@@ -76,6 +80,7 @@ export class UsersController {
         @Body() updateUserDto: UpdateUserDto,
     ) {
         assertCanActOn(actor, id);
+        assertNotSelfPrivileged(actor, id, updateUserDto);
         return this.usersService.update(id, scopeUpdate(actor, updateUserDto));
     }
 

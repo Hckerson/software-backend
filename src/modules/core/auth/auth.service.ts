@@ -12,12 +12,14 @@ import {
 import { Prisma } from 'generated/prisma/client';
 import { UserRole } from 'generated/prisma/enums';
 import { PasswordUtil } from './utils/password.util';
+import { SUSPENDED_MESSAGE, isSuspended } from './account-status';
 import { metricBuilder } from 'src/lib/metric-builder';
 import { UsersService, type PublicUser } from '@core/users/users.service';
 import type { AuthResponse, JwtPayload } from './types/auth.types';
 import { LoginDto, RegisterDto, ResetPasswordDto, OnboardingDto } from './dto';
 
 import {
+    ForbiddenException,
     Injectable,
     Logger,
     NotFoundException,
@@ -169,6 +171,12 @@ export class AuthService {
         );
         if (!passwordValid)
             throw new UnauthorizedException('Invalid credentials');
+
+        // Only after the password is proven: checking status first would tell
+        // an anonymous caller that this email exists and is suspended.
+        if (isSuspended(user.status)) {
+            throw new ForbiddenException(SUSPENDED_MESSAGE);
+        }
 
         return user;
     }
