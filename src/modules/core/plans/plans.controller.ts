@@ -13,8 +13,14 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PlansService } from './plans.service';
 import { CreatePlanDto, UpdatePlanDto } from './dto';
-import { JwtAuthGuard } from '@core/auth/guards';
+import { JwtAuthGuard, RolesGuard } from '@core/auth/guards';
 import { Roles } from '@core/auth/decorators';
+import {
+    ApiOkResponse,
+    ApiCreatedResponse,
+    ApiNoContentResponse,
+} from '@nestjs/swagger';
+import { SubscriptionPlanDto } from '@common/dto';
 
 @ApiTags('Billing - Plans')
 @Controller('billing/plans')
@@ -22,20 +28,23 @@ export class PlansController {
     constructor(private plansService: PlansService) {}
 
     @ApiOperation({ summary: 'Get all subscription plans' })
+    @ApiOkResponse({ type: SubscriptionPlanDto, isArray: true })
     @Get()
     async getAllPlans() {
         return await this.plansService.getAllPlans();
     }
 
     @ApiOperation({ summary: 'Get plan by ID' })
+    @ApiOkResponse({ type: SubscriptionPlanDto })
     @Get(':id')
     async getPlanById(@Param('id') id: string) {
         return await this.plansService.getPlanById(id);
     }
 
     @ApiOperation({ summary: 'Create new subscription plan (admin only)' })
+    @ApiCreatedResponse({ type: SubscriptionPlanDto })
     @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post()
     @HttpCode(HttpStatus.CREATED)
@@ -44,8 +53,9 @@ export class PlansController {
     }
 
     @ApiOperation({ summary: 'Update subscription plan (admin only)' })
+    @ApiOkResponse({ type: SubscriptionPlanDto })
     @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id')
     async updatePlan(
@@ -56,8 +66,9 @@ export class PlansController {
     }
 
     @ApiOperation({ summary: 'Delete subscription plan (admin only)' })
+    @ApiNoContentResponse()
     @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
@@ -66,8 +77,9 @@ export class PlansController {
     }
 
     @ApiOperation({ summary: 'Deactivate plan (admin only)' })
+    @ApiOkResponse({ type: SubscriptionPlanDto })
     @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/deactivate')
     async deactivatePlan(@Param('id') id: string) {
@@ -75,8 +87,9 @@ export class PlansController {
     }
 
     @ApiOperation({ summary: 'Activate plan (admin only)' })
+    @ApiOkResponse({ type: SubscriptionPlanDto })
     @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/activate')
     async activatePlan(@Param('id') id: string) {

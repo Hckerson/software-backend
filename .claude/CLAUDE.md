@@ -45,61 +45,26 @@ Never replace a derived artifact with `any`, `Record<>`, `as` assertions, or han
 
 ## Required patterns
 
-| Layer          | Responsibility                                                                                                                         | Rules                                                                                                                                                        |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Controller** | Extract route params + body, call service, return result. Add `@UseGuards(JwtAuthGuard)` + `@Roles()` for protected routes.            | No business logic. No Prisma. No direct repo calls.                                                                                                          |
-| **Service**    | Accept DTOs, enforce business rules, throw `HttpException`s, call repo methods, return domain objects.                                 | No raw Prisma models in responses. No `req`/`res` objects. Never throw `RepoError` directly. Business logic, filtering, aggregation, composition — all here. |
-| **Repository** | **ONLY** wrap the 10 Prisma-native methods in `try/catch`, rethrow as `RepoError`. Use `Prisma.[Model]GetPayload<>` for typed results. | Thin Prisma wrapper only. See "Repository Methods: Ironclad Rule" below. No custom domain methods.                                                           |
-| **DTO**        | Use class-validator decorators for input validation at the boundary. `UpdateDto extends PartialType(CreateDto)`.                       | Type source for incoming data. Never used as response shape.                                                                                                 |
-| **Module**     | Import dependencies, declare controller + service, export service if shared.                                                           | DI wiring only.                                                                                                                                              |
-
-## Repository Methods: Ironclad Rule
-
-**Repositories are ONLY thin wrappers around Prisma's 10 native methods.** No custom domain methods.
-
-### ✅ Allowed repo methods (and ONLY these):
-
-- `findUnique(params: T)` → `Prisma.[Model]GetPayload<T> | null`
-- `findFirst(params: T)` → `Prisma.[Model]GetPayload<T> | null`
-- `findMany(params: T)` → `Prisma.[Model]GetPayload<T>[]`
-- `create(params: T)` → `Prisma.[Model]GetPayload<T>`
-- `createMany(params)` → `Prisma.BatchPayload`
-- `update(params: T)` → `Prisma.[Model]GetPayload<T>`
-- `updateMany(params)` → `Prisma.BatchPayload`
-- `delete(params: T)` → `Prisma.[Model]GetPayload<T>`
-- `deleteMany(params)` → `Prisma.BatchPayload`
-- `count(params?)` → `number`
-- `groupBy(field, where)` → aggregation rows. **The one method that may not be a generic pass-through:** Prisma's `InputErrors` type only collapses at a literal call site, so a `groupBy<T>(params: T)` wrapper cannot type-check without a suppression. Take the grouping field and filter as plain arguments and build the args object inside the repo.
-
-### ❌ Forbidden (move to Service if needed):
-
-- `findByResourceId()`, `findByActorId()`, `search()`, `findRecent()` — these are NOT Prisma methods
-- `getStatistics()`, `getUserActivitySummary()`, `export()` — business logic, belongs in Service
-- `findSensitiveActions()`, `findByDateRange()`, `findChanges()` — filtering & composition belong in Service
-- Any method that applies domain logic, filtering beyond the params, or aggregation
-
----
+| Layer          | Responsibility                                                                                                              | Rules                                                                                        |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Controller** | Extract route params + body, call service, return result. Add `@UseGuards(JwtAuthGuard)` + `@Roles()` for protected routes. | No business logic. No Prisma. No direct repo calls.                                          |
+| **Service**    | Accept DTOs, enforce business rules, throw `HttpException`s, call repo methods, return domain objects.                      | No raw Prisma models in responses. No `req`/`res` objects. Never throw `RepoError` directly. |
+| **Repository** | Wrap Prisma calls in `try/catch`, rethrow as `RepoError`. Use `Prisma.[Model]GetPayload<>` for typed results.               | No business logic. Prisma only. Data access only.                                            |
+| **DTO**        | Use class-validator decorators for input validation at the boundary. `UpdateDto extends PartialType(CreateDto)`.            | Type source for incoming data. Never used as response shape.                                 |
+| **Module**     | Import dependencies, declare controller + service, export service if shared.                                                | DI wiring only.                                                                              |
 
 ## Folder Structure
 
-| Route                     | Purpose                                                                                                                              |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `/src/common/`            | Shared infrastructure: repos, filters, guards, errors, enums, decorators, middleware.                                                |
-| `/src/common/repos/`      | Data access layer. One `[domain].repo.ts` per entity. Prisma only. **Repos = thin wrappers around Prisma's 10 native methods only.** |
-| `/src/common/errors/`     | Error definitions and error filter.                                                                                                  |
-| `/src/common/enums/`      | Constants and enums. Single source of truth.                                                                                         |
-| `/src/common/decorators/` | Custom decorators (auth, roles, etc.).                                                                                               |
-| `/src/lib/`               | Pure utility functions and helpers. No NestJS dependencies.                                                                          |
-| `/src/modules/core/`      | Domain-specific modules. One folder per domain with `dto/`, `*.service.ts`, `*.controller.ts`, `*.module.ts`.                        |
-| `/src/modules/core/auth/` | Authentication logic. Already implemented. Extend, don't reinvent.                                                                   |
-
-## The published contract
-
-This repo is the **origin of the API contract**. DTOs carry `@ApiProperty`, and `pnpm openapi` compiles the project and writes `openapi.json` from the Swagger document (`src/openapi.ts` holds the shared config used by both `main.ts` and `src/openapi.emit.ts`).
-
-The Next.js starter generates its Zod schemas, types, and route builders from that file, so **a DTO field rename is a breaking change to the frontend build**. Re-run `pnpm openapi` whenever a DTO, controller route, or `@ApiProperty` changes, and commit the regenerated `openapi.json`.
-
-The emitter runs from compiled output on purpose — esbuild-based runners (`tsx`) do not emit `design:paramtypes`, so Swagger silently drops every request body. It boots in preview mode, so contract generation needs neither a database nor secrets. Booting the app for real does: copy `.env.example` to `.env` first, or `AuthModule` aborts on the missing `JWT_SECRET`.
+| Route                     | Purpose                                                                                                       |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `/src/common/`            | Shared infrastructure: repos, filters, guards, errors, enums, decorators, middleware.                         |
+| `/src/common/repos/`      | Data access layer. One `[domain].repo.ts` per entity. Prisma only.                                            |
+| `/src/common/errors/`     | Error definitions and error filter.                                                                           |
+| `/src/common/enums/`      | Constants and enums. Single source of truth.                                                                  |
+| `/src/common/decorators/` | Custom decorators (auth, roles, etc.).                                                                        |
+| `/src/lib/`               | Pure utility functions and helpers. No NestJS dependencies.                                                   |
+| `/src/modules/core/`      | Domain-specific modules. One folder per domain with `dto/`, `*.service.ts`, `*.controller.ts`, `*.module.ts`. |
+| `/src/modules/core/auth/` | Authentication logic. Already implemented. Extend, don't reinvent.                                            |
 
 ## Workflow: Add a new domain
 
@@ -125,10 +90,11 @@ The emitter runs from compiled output on purpose — esbuild-based runners (`tsx
 
 ## Before you commit or push
 
-Prettier owns formatting — never override it by hand. Lint violations are fixed, never suppressed.
+Formatting and linting are automated. They are not chores you run by hand.
 
-`pnpm format`, `pnpm lint`, `pnpm type-check` and `pnpm build` are available for a manual sweep; run them only when asked. No Husky hooks are installed in this repo, so nothing gates a commit or push automatically.
-
+- **Commit** — Husky's `pre-commit` hook runs `pnpm lint-staged` and nothing else: `eslint --fix` then `prettier --write`, over staged files only. It is fast by design.
+- **Push** — Husky's `pre-push` hook runs `pnpm type-check`, then `pnpm lint`, and blocks on failure. This is the real gate.
+- **Build** — `pnpm build` must succeed. That one is on you.
 - **OpenAPI** — if any DTO, route, or `@ApiProperty` changed, run `pnpm openapi` and commit `openapi.json`.
 
 ## Pre-merge checklist

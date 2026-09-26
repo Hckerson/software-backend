@@ -3,6 +3,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '@core/users/users.service';
 import { PrismaService } from '@common/database/prisma.service';
+import type { Request } from 'express';
+import { readAuthCookie } from '../auth.cookie';
+import { JWT_ALGORITHM, publicKeyFrom } from '../auth.keys';
+import { isSuspended } from '../account-status';
 import type { AuthUser, JwtPayload } from '../types/auth.types';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
@@ -13,23 +17,27 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         private readonly usersService: UsersService,
         private readonly prisma: PrismaService,
     ) {
-        const secret = configService.get<string>('JWT_SECRET');
-        if (!secret) {
-            throw new Error(
-                'JWT_SECRET is not defined in environment variables',
-            );
-        }
+        const publicKey = publicKeyFrom(configService);
+
+        const fromCookie = (request: Request): string | null =>
+            readAuthCookie(request.headers.cookie);
 
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                fromCookie,
+                ExtractJwt.fromAuthHeaderAsBearerToken(),
+            ]),
             ignoreExpiration: false,
-            secretOrKey: secret,
+            secretOrKey: publicKey,
+            algorithms: [JWT_ALGORITHM],
         });
     }
 
     async validate(payload: JwtPayload): Promise<AuthUser> {
         const user = await this.usersService.findOne(payload.sub);
-        if (!user) throw new UnauthorizedException();
+        if (!user || isSuspended(user.status)) {
+            throw new UnauthorizedException();
+        }
         return {
             id: user.id,
             role: user.role,
