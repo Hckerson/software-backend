@@ -44,7 +44,7 @@ export class AuthService {
         const passwordHash = await PasswordUtil.hash(dto.password);
         const data = metricBuilder<Prisma.UserCreateInput>({
             passwordHash,
-            role: dto.role,
+            role: UserRole.USER,
             email: dto.email,
             fullName: dto.fullName,
             phoneNumber: dto.phoneNumber,

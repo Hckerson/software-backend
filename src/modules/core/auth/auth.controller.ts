@@ -28,9 +28,9 @@ import {
     ApiOperation,
     ApiOkResponse,
     ApiBearerAuth,
-    ApiCreatedResponse,
 } from '@nestjs/swagger';
 import type { RequestWithUser } from '@common/interfaces/req';
+import { ApiEnvelope } from '@common/decorators/api-envelope.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -39,11 +39,7 @@ export class AuthController {
 
     @Post('register')
     @ApiOperation({ summary: 'Register a new user' })
-    @ApiCreatedResponse({
-        type: AuthResponseDto,
-        description:
-            'User successfully registered. Returns user + accessToken.',
-    })
+    @ApiEnvelope(AuthResponseDto, { status: 201 })
     @ApiResponse({ status: 409, description: 'User already exists' })
     async register(
         @Body() dto: RegisterDto,
@@ -59,7 +55,7 @@ export class AuthController {
     @Post('login')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Login and get JWT token' })
-    @ApiOkResponse({ type: AuthResponseDto, description: 'Login successful' })
+    @ApiEnvelope(AuthResponseDto)
     @ApiResponse({ status: 401, description: 'Invalid credentials' })
     async login(
         @Body() dto: LoginDto,
