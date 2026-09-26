@@ -20,7 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config ./test/jest-e2e.json",
     "test:e2e:setup": "docker compose up -d db && node tools/setup-test-db.mjs",
-    "openapi": "nest build && node dist/src/openapi.js",
+    "openapi": "nest build && node dist/src/openapi.emit.js",
     "keys:generate": "node tools/generate-keys.mjs",
     "prisma:generate": "npx prisma generate",
     "prisma:push": "npx prisma db push",
@@ -28,7 +28,9 @@
     "seed": "nest build && node dist/prisma/seed.js",
     "db:constraints": "nest build && node dist/prisma/apply-constraints.js",
     "type-check": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "prisma generate",
+    "db:seed": "prisma db seed"
   },
   "prisma": {
     "seed": "nest build && node dist/prisma/seed.js"

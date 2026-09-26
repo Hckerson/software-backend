@@ -15,10 +15,13 @@ import { UsageModule } from '@core/usage/usage.module';
 import { BillingModule } from '@core/billing/billing.module';
 import { CycleModule } from '@core/cycle/cycle.module';
 import { PaymentMethodsModule } from '@core/payment-methods/payment-methods.module';
+import { HealthModule } from '@core/health/health.module';
+import { StatsModule } from '@core/stats/stats.module';
+import { validateEnv } from '@common/config/env.validation';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
         ScheduleModule.forRoot(),
         PrismaModule,
         RepoModule,
@@ -32,6 +35,8 @@ import { PaymentMethodsModule } from '@core/payment-methods/payment-methods.modu
         BillingModule,
         CycleModule,
         PaymentMethodsModule,
+        HealthModule,
+        StatsModule,
     ],
     controllers: [AppController],
     providers: [AppService],
