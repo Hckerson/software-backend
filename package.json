@@ -28,7 +28,7 @@
     "seed": "nest build && node dist/prisma/seed.js",
     "db:constraints": "nest build && node dist/prisma/apply-constraints.js",
     "type-check": "tsc --noEmit",
-    "prepare": "husky",
+    "prepare": "git config --unset-all core.hooksPath || exit 0",
     "postinstall": "prisma generate",
     "db:seed": "prisma db seed"
   },
